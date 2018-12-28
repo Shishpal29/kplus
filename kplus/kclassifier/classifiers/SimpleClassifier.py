@@ -24,29 +24,21 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from keras.applications.resnet50 import ResNet50
-from keras.models import Model
-
-from kplus.kclassifier.models.AbstractModel import AbstractModel
+from kplus.kclassifier.classifiers.AbstractClassifier import AbstractClassifier
 
 
-class ResNet50Model(AbstractModel):
-    def __init__(self, input_size):
-        resnet50 = ResNet50(
-            input_shape=(input_size, input_size, 3),
-            weights=None,
-            include_top=False)
-        # Remove the average pooling layer.
-        resnet50.layers.pop()
-        self.feature_extractor = Model(resnet50.layers[0].input,
-                                       resnet50.layers[-1].output)
+class SimpleClassifier(AbstractClassifier):
+    def __init__(self):
+        self._model = None
 
-    def normalize(self, image):
-        image = image[..., ::-1]
-        image = image.astype('float')
+    def load_weights(self, weight_path):
+        self._model.load_weights(weight_path)
 
-        image[..., 0] -= 103.939
-        image[..., 1] -= 116.779
-        image[..., 2] -= 123.68
+    def train(self):
+        pass
 
-        return (image)
+    def evaluate(self):
+        pass
+
+    def predict(self):
+        pass
