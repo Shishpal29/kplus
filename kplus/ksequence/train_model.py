@@ -31,7 +31,7 @@ import sys
 import os
 import argparse
 
-from kplus.ksequence.datasets.Image_Generator import TextImageGenerator
+from kplus.ksequence.datasets.Input_Generator import TextImageGenerator
 from kplus.ksequence.models.Model import get_Model
 from kplus.ksequence.parameter import *
 from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
