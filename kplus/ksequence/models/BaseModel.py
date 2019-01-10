@@ -67,7 +67,9 @@ class BaseModel(object):
             kernel_initializer='he_normal')(inputs)  # (None, 128, 64, 64)
 
         inner = BatchNormalization()(inner)
+
         inner = Activation('relu')(inner)
+
         inner = MaxPooling2D(
             pool_size=(2, 2), name='max1')(inner)  # (None,64, 32, 64)
 
@@ -78,7 +80,9 @@ class BaseModel(object):
             kernel_initializer='he_normal')(inner)  # (None, 64, 32, 128)
 
         inner = BatchNormalization()(inner)
+
         inner = Activation('relu')(inner)
+
         inner = MaxPooling2D(
             pool_size=(2, 2), name='max2')(inner)  # (None, 32, 16, 128)
 
@@ -87,15 +91,21 @@ class BaseModel(object):
             padding='same',
             name='conv3',
             kernel_initializer='he_normal')(inner)  # (None, 32, 16, 256)
+
         inner = BatchNormalization()(inner)
+
         inner = Activation('relu')(inner)
+
         inner = Conv2D(
             256, (3, 3),
             padding='same',
             name='conv4',
             kernel_initializer='he_normal')(inner)  # (None, 32, 16, 256)
+
         inner = BatchNormalization()(inner)
+
         inner = Activation('relu')(inner)
+
         inner = MaxPooling2D(
             pool_size=(1, 2), name='max3')(inner)  # (None, 32, 8, 256)
 
@@ -104,13 +114,19 @@ class BaseModel(object):
             padding='same',
             name='conv5',
             kernel_initializer='he_normal')(inner)  # (None, 32, 8, 512)
+
         inner = BatchNormalization()(inner)
+
         inner = Activation('relu')(inner)
+
         inner = Conv2D(
             512, (3, 3), padding='same',
             name='conv6')(inner)  # (None, 32, 8, 512)
+
         inner = BatchNormalization()(inner)
+
         inner = Activation('relu')(inner)
+
         inner = MaxPooling2D(
             pool_size=(1, 2), name='max4')(inner)  # (None, 32, 4, 512)
 
@@ -119,13 +135,16 @@ class BaseModel(object):
             padding='same',
             kernel_initializer='he_normal',
             name='con7')(inner)  # (None, 32, 4, 512)
+
         inner = BatchNormalization()(inner)
+
         inner = Activation('relu')(inner)
 
         # CNN to RNN
         inner = Reshape(
             target_shape=((32, 2048)),
             name='reshape')(inner)  # (None, 32, 2048)
+
         inner = Dense(
             64,
             activation='relu',
@@ -138,13 +157,16 @@ class BaseModel(object):
             return_sequences=True,
             kernel_initializer='he_normal',
             name='lstm1')(inner)  # (None, 32, 512)
+
         lstm_1b = LSTM(
             256,
             return_sequences=True,
             go_backwards=True,
             kernel_initializer='he_normal',
             name='lstm1_b')(inner)
+
         lstm1_merged = add([lstm_1, lstm_1b])  # (None, 32, 512)
+
         lstm1_merged = BatchNormalization()(lstm1_merged)
 
         lstm_2 = LSTM(
@@ -152,26 +174,32 @@ class BaseModel(object):
             return_sequences=True,
             kernel_initializer='he_normal',
             name='lstm2')(lstm1_merged)
+
         lstm_2b = LSTM(
             256,
             return_sequences=True,
             go_backwards=True,
             kernel_initializer='he_normal',
             name='lstm2_b')(lstm1_merged)
+
         lstm2_merged = concatenate([lstm_2, lstm_2b])  # (None, 32, 1024)
+
         lstm_merged = BatchNormalization()(lstm2_merged)
 
         # transforms RNN output to character activations:
         inner = Dense(
             num_classes, kernel_initializer='he_normal',
             name='dense2')(lstm2_merged)  #(None, 32, 42)
+
         y_pred = Activation('softmax', name='softmax')(inner)
 
         labels = Input(
             name='the_labels', shape=[max_text_len],
             dtype='float32')  # (None ,9)
+
         input_length = Input(
             name='input_length', shape=[1], dtype='int64')  # (None, 1)
+
         label_length = Input(
             name='label_length', shape=[1], dtype='int64')  # (None, 1)
 
