@@ -76,7 +76,7 @@ def main(args):
     epoch = args.max_number_of_epoch
 
     # # Model description and training
-    model = get_Model(training=True)
+    model = get_model(training=True)
 
     try:
         model.load_weights('LSTM+BN4--26--0.011.hdf5')
