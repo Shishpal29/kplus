@@ -189,7 +189,7 @@ class BaseModel(object):
         # transforms RNN output to character activations:
         inner = Dense(
             num_classes, kernel_initializer='he_normal',
-            name='dense2')(lstm2_merged)  #(None, 32, 42)
+            name='dense2')(lstm2_merged)  #(None, 32, 63)
 
         y_pred = Activation('softmax', name='softmax')(inner)
 
