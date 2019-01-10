@@ -38,8 +38,15 @@ K.set_learning_phase(0)
 
 
 class BaseModel(object):
+
+    __name = 'base'
+
     def __init__(self):
         pass
+
+    @classmethod
+    def name(cls):
+        return (BaseModel.__name)
 
     @classmethod
     # # Loss and train functions, network architecture
@@ -51,7 +58,7 @@ class BaseModel(object):
         return K.ctc_batch_cost(labels, y_pred, input_length, label_length)
 
     @classmethod
-    def get_model(cls, training):
+    def get_model(cls, is_training):
         input_shape = (img_w, img_h, 1)  # (128, 64, 1)
 
         # Make Networkw
@@ -210,7 +217,7 @@ class BaseModel(object):
             name='ctc')([y_pred, labels, input_length,
                          label_length])  #(None, 1)
 
-        if training:
+        if is_training:
             return Model(
                 inputs=[inputs, labels, input_length, label_length],
                 outputs=loss_out)

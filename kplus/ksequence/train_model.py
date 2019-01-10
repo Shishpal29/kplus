@@ -33,7 +33,7 @@ from keras.optimizers import Adadelta
 from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
 
 from kplus.ksequence.datasets.SimpleGenerator import SimpleGenerator
-from kplus.ksequence.models.BaseModel import BaseModel
+from kplus.ksequence.models.ModelFactory import ModelFactory
 from kplus.ksequence.parameter import *
 
 K.set_learning_phase(0)
@@ -75,7 +75,7 @@ def main(args):
     epoch = args.max_number_of_epoch
 
     # # Model description and training
-    model = BaseModel.get_model(training=True)
+    model = ModelFactory.get_model('base', is_training=True)
 
     try:
         model.load_weights('LSTM+BN4--26--0.011.hdf5')

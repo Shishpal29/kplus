@@ -24,7 +24,16 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from kplus.ksequence.models.BaseModel import BaseModel
+
 
 class ModelFactory(object):
     def __init__(self):
         pass
+
+    @classmethod
+    def get_model(cls, name, is_training):
+        if (name == BaseModel.name()):
+            return (BaseModel.get_model(is_training))
+        else:
+            return (BaseModel.get_model(is_training))
