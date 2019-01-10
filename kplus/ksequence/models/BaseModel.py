@@ -135,6 +135,7 @@ def get_model(training):
         name='lstm1_b')(inner)
     lstm1_merged = add([lstm_1, lstm_1b])  # (None, 32, 512)
     lstm1_merged = BatchNormalization()(lstm1_merged)
+
     lstm_2 = LSTM(
         256,
         return_sequences=True,

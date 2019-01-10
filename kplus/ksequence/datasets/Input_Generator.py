@@ -1,3 +1,29 @@
+# MIT License
+#
+# Copyright (c) 2018
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import cv2
 import os, random
 import numpy as np
@@ -5,11 +31,11 @@ from parameter import letters
 
 
 # # Input data generator
-def labels_to_text(labels):  # letters의 index -> text (string)
+def labels_to_text(labels):  # letters index -> text (string)
     return ''.join(list(map(lambda x: letters[int(x)], labels)))
 
 
-def text_to_labels(text):  # text를 letters 배열에서의 인덱스 값으로 변환
+def text_to_labels(text):  # text letters
     return list(map(lambda x: letters.index(x), text))
 
 
@@ -34,7 +60,6 @@ class TextImageGenerator:
         self.imgs = np.zeros((self.n, self.img_h, self.img_w))
         self.texts = []
 
-    ## samples의 이미지 목록들을 opencv로 읽어 저장하기, texts에는 label 저장
     def build_data(self):
         print(self.n, " Image Loading start...")
         for i, img_file in enumerate(self.img_dir):
@@ -48,7 +73,7 @@ class TextImageGenerator:
         print(len(self.texts) == self.n)
         print(self.n, " Image Loading finish...")
 
-    def next_sample(self):  ## index max -> 0 으로 만들기
+    def next_sample(self):
         self.cur_index += 1
         if self.cur_index >= self.n:
             self.cur_index = 0
@@ -56,7 +81,7 @@ class TextImageGenerator:
         return self.imgs[self.indexes[self.cur_index]], self.texts[
             self.indexes[self.cur_index]]
 
-    def next_batch(self):  ## batch size만큼 가져오기
+    def next_batch(self):
         while True:
             X_data = np.ones([self.batch_size, self.img_w, self.img_h,
                               1])  # (bs, 128, 64, 1)
@@ -73,14 +98,11 @@ class TextImageGenerator:
                 Y_data[i] = text_to_labels(text)
                 label_length[i] = len(text)
 
-            # dict 형태로 복사
             inputs = {
                 'the_input': X_data,  # (bs, 128, 64, 1)
                 'the_labels': Y_data,  # (bs, 8)
-                'input_length': input_length,  # (bs, 1) -> 모든 원소 value = 30
-                'label_length': label_length  # (bs, 1) -> 모든 원소 value = 8
+                'input_length': input_length,  # (bs, 1) -> value = 30
+                'label_length': label_length  # (bs, 1) -> value = 8
             }
-            outputs = {
-                'ctc': np.zeros([self.batch_size])
-            }  # (bs, 1) -> 모든 원소 0
+            outputs = {'ctc': np.zeros([self.batch_size])}
             yield (inputs, outputs)
