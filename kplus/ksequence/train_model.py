@@ -24,18 +24,18 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from keras import backend as K
-from keras.optimizers import Adadelta
-
 import sys
 import os
 import argparse
 from time import time
 
+from keras import backend as K
+from keras.optimizers import Adadelta
+from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
+
 from kplus.ksequence.datasets.SimpleGenerator import SimpleGenerator
 from kplus.ksequence.models.BaseModel import get_model
 from kplus.ksequence.parameter import *
-from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
 
 K.set_learning_phase(0)
 
