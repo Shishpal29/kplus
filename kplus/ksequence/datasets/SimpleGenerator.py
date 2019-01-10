@@ -27,7 +27,8 @@ from __future__ import print_function
 import cv2
 import os, random
 import numpy as np
-from parameter import letters
+
+from kplus.ksequence.parameter import letters
 
 
 # # Input data generator
@@ -39,7 +40,7 @@ def text_to_labels(text):  # text letters
     return list(map(lambda x: letters.index(x), text))
 
 
-class TextImageGenerator:
+class SimpleGenerator:
     def __init__(self,
                  img_dirpath,
                  img_w,

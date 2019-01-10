@@ -30,13 +30,12 @@ from keras.optimizers import Adadelta
 import sys
 import os
 import argparse
+from time import time
 
-from kplus.ksequence.datasets.Input_Generator import TextImageGenerator
+from kplus.ksequence.datasets.SimpleGenerator import SimpleGenerator
 from kplus.ksequence.models.BaseModel import get_model
 from kplus.ksequence.parameter import *
 from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
-from time import time
-import matplotlib.pyplot as plt
 
 K.set_learning_phase(0)
 
@@ -71,9 +70,11 @@ def main(args):
         raise ValueError(
             'You must supply the test dataset directory with --test_dataset_dir.'
         )
+
     train_file_path = args.train_dataset_dir
     valid_file_path = args.test_dataset_dir
     epoch = args.max_number_of_epoch
+
     # # Model description and training
     model = get_Model(training=True)
 
@@ -84,12 +85,12 @@ def main(args):
         print("...New weight data...")
         pass
 
-    tiger_train = TextImageGenerator(train_file_path, img_w, img_h, batch_size,
-                                     downsample_factor)
+    tiger_train = SimpleGenerator(train_file_path, img_w, img_h, batch_size,
+                                  downsample_factor)
     tiger_train.build_data()
 
-    tiger_val = TextImageGenerator(valid_file_path, img_w, img_h,
-                                   val_batch_size, downsample_factor)
+    tiger_val = SimpleGenerator(valid_file_path, img_w, img_h, val_batch_size,
+                                downsample_factor)
     tiger_val.build_data()
 
     ada = Adadelta()
@@ -104,12 +105,14 @@ def main(args):
 
     early_stop = EarlyStopping(
         monitor='loss', min_delta=0.001, patience=4, mode='min', verbose=1)
+
     checkpoint = ModelCheckpoint(
         filepath='LSTM+BN5--{epoch:02d}--{val_loss:.3f}.hdf5',
         monitor='loss',
         verbose=1,
         mode='min',
         period=1)
+
     tensor_board = TensorBoard(
         log_dir='./Graph',
         histogram_freq=0,
