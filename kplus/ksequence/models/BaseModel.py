@@ -33,7 +33,7 @@ from keras.models import Model
 from keras.layers.recurrent import LSTM
 from keras.layers import Bidirectional
 
-from parameter import *
+from kplus.ksequence.parameter import *
 
 K.set_learning_phase(0)
 
