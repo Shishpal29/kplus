@@ -36,6 +36,7 @@ from parameter import *
 
 K.set_learning_phase(0)
 
+
 # # Loss and train functions, network architecture
 def ctc_lambda_func(args):
     y_pred, labels, input_length, label_length = args
@@ -121,12 +122,30 @@ def get_model(training):
         name='dense1')(inner)  # (None, 32, 64)
 
     # RNN layer
-    lstm_1 = LSTM(256, return_sequences=True, kernel_initializer='he_normal', name='lstm1')(inner)  # (None, 32, 512)
-    lstm_1b = LSTM(256, return_sequences=True, go_backwards=True, kernel_initializer='he_normal', name='lstm1_b')(inner)
+    lstm_1 = LSTM(
+        256,
+        return_sequences=True,
+        kernel_initializer='he_normal',
+        name='lstm1')(inner)  # (None, 32, 512)
+    lstm_1b = LSTM(
+        256,
+        return_sequences=True,
+        go_backwards=True,
+        kernel_initializer='he_normal',
+        name='lstm1_b')(inner)
     lstm1_merged = add([lstm_1, lstm_1b])  # (None, 32, 512)
     lstm1_merged = BatchNormalization()(lstm1_merged)
-    lstm_2 = LSTM(256, return_sequences=True, kernel_initializer='he_normal', name='lstm2')(lstm1_merged)
-    lstm_2b = LSTM(256, return_sequences=True, go_backwards=True, kernel_initializer='he_normal', name='lstm2_b')(lstm1_merged)
+    lstm_2 = LSTM(
+        256,
+        return_sequences=True,
+        kernel_initializer='he_normal',
+        name='lstm2')(lstm1_merged)
+    lstm_2b = LSTM(
+        256,
+        return_sequences=True,
+        go_backwards=True,
+        kernel_initializer='he_normal',
+        name='lstm2_b')(lstm1_merged)
     lstm2_merged = concatenate([lstm_2, lstm_2b])  # (None, 32, 1024)
     lstm_merged = BatchNormalization()(lstm2_merged)
 
