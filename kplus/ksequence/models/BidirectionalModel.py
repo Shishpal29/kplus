@@ -24,19 +24,30 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from kplus.ksequence.models.BaseModel import BaseModel
-from kplus.ksequence.models.BidirectionalModel import BidirectionalModel
+from keras import backend as K
+from keras.layers import Conv2D, MaxPooling2D
+from keras.layers import Input, Dense, Activation
+from keras.layers import Reshape, Lambda, BatchNormalization
+from keras.layers.merge import add, concatenate
+from keras.models import Model
+from keras.layers.recurrent import LSTM
+
+from kplus.ksequence.parameter import *
+
+K.set_learning_phase(0)
 
 
-class ModelFactory(object):
+class BidirectionalModel(object):
+
+    __name = 'bidirectional'
+
     def __init__(self):
         pass
 
     @classmethod
-    def get_model(cls, name, is_training):
-        if (name == BaseModel.name()):
-            return (BaseModel.get_model(is_training))
-        elif (name == BidirectionalModel.name()):
-            return (BidirectionalModel.get_model(is_training))
-        else:
-            return (BaseModel.get_model(is_training))
+    def name(cls):
+        return (BidirectionalModel.__name)
+
+    @classmethod
+    def get_model(cls, is_training):
+        return (None)
