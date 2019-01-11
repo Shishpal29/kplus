@@ -38,9 +38,9 @@ class ResNet50Model(AbstractModel):
     def name(cls):
         return (ResNet50Model.__name)
 
-    def __init__(self, input_size):
+    def __init__(self, input_shape):
         resnet50 = ResNet50(
-            input_shape=(input_size, input_size, 3),
+            input_shape=(input_shape[0], input_shape[1], 3),
             weights=None,
             include_top=False)
         # Remove the average pooling layer.

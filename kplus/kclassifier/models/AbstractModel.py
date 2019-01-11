@@ -35,5 +35,5 @@ class AbstractModel(object):
     def get_output_shape(self):
         return (self.feature_extractor.get_output_shape_at(-1)[1:3])
 
-    def extract(self, input_image):
+    def extract_features(self, input_image):
         return (self.feature_extractor(input_image))
