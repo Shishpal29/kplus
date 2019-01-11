@@ -31,6 +31,13 @@ from kplus.kclassifier.models.AbstractModel import AbstractModel
 
 
 class ResNet50Model(AbstractModel):
+
+    __name = 'resnet_50'
+
+    @classmethod
+    def name(cls):
+        return (ResNet50Model.__name)
+
     def __init__(self, input_size):
         resnet50 = ResNet50(
             input_shape=(input_size, input_size, 3),

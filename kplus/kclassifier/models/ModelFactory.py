@@ -24,7 +24,19 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from kplus.kclassifier.models.ResNet50Model import ResNet50Model
+from kplus.kclassifier.models.SimpleVGGModel import SimpleVGGModel
+
 
 class ModelFactory(object):
     def __init__(self):
         pass
+
+    @classmethod
+    def simple_model(cls, model_name):
+        if (model_name == ResNet50Model.name()):
+            return (ResNet50Model())
+        elif (model_name == SimpleVGGModel.name()):
+            return (SimpleVGGModel())
+        else:
+            return (ResNet50Model())

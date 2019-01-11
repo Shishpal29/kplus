@@ -31,6 +31,13 @@ from kplus.kclassifier.models.AbstractModel import AbstractModel
 
 
 class SimpleVGGModel(AbstractModel):
+
+    __name = 'simple_vgg'
+
+    @classmethod
+    def name(cls):
+        return (SimpleVGGModel.__name)
+
     def __init__(self, input_size):
         pass
 
