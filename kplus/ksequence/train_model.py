@@ -57,6 +57,12 @@ def parse_arguments(argv):
         default='simple_vgg')
 
     parser.add_argument(
+        '--train_root_dir',
+        type=str,
+        help='Input train root directory where model weights are saved.',
+        default='./train')
+
+    parser.add_argument(
         '--max_number_of_epoch',
         type=int,
         help='The maximum number of training epoch.',
@@ -132,15 +138,20 @@ def main(args):
     early_stop = EarlyStopping(
         monitor='loss', min_delta=0.001, patience=4, mode='min', verbose=1)
 
+    train_root_dir = os.path.expanduser(args.train_root_dir)
+    checkpoint_path = os.path.join(train_root_dir,
+                                   'model--{epoch:03d}--{val_loss:.5f}.hdf5')
+    tensorboard_path = os.path.join(train_root_dir, 'tensorboard')
+
     checkpoint = ModelCheckpoint(
-        filepath='LSTM+BN5--{epoch:02d}--{val_loss:.3f}.hdf5',
+        filepath=checkpoint_path,
         monitor='loss',
         verbose=1,
         mode='min',
         period=1)
 
     tensor_board = TensorBoard(
-        log_dir='./Graph',
+        log_dir=tensorboard_path,
         histogram_freq=0,
         write_graph=True,
         write_images=False)
