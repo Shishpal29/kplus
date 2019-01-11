@@ -90,6 +90,7 @@ def main(args):
     epoch = args.max_number_of_epoch
 
     sequence_model = ModelFactory.simple_model('base')
+    sequence_model.use_feature_extractor('simple_vgg')
     keras_model = sequence_model.keras_model(is_training=True)
 
     try:

@@ -34,6 +34,8 @@ from keras.layers.recurrent import LSTM
 
 from kplus.ksequence.parameter import *
 
+from kplus.kclassifier.models.ModelFactory import ModelFactory
+
 K.set_learning_phase(0)
 
 
@@ -42,11 +44,15 @@ class BaseModel(object):
     __name = 'base'
 
     def __init__(self):
-        pass
+        self._feature_extractor = None
 
     @classmethod
     def name(cls):
         return (BaseModel.__name)
+
+    def use_feature_extractor(self, feature_extractor):
+        self._feature_extractor = ModelFactory.simple_model(
+            feature_extractor, input_shape=(img_w, img_h, 1))
 
     def loss_function(self, args):
         y_pred, labels, input_length, label_length = args
