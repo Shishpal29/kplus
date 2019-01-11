@@ -65,95 +65,16 @@ class BaseModel(object):
         input_shape = (img_w, img_h, 1)  # (128, 64, 1)
 
         # Make Networkw
-        inputs = Input(
+        input_image = Input(
             name='the_input', shape=input_shape,
             dtype='float32')  # (None, 128, 64, 1)
 
-        # Convolution layer (VGG)
-        inner = Conv2D(
-            64, (3, 3),
-            padding='same',
-            name='conv1',
-            kernel_initializer='he_normal')(inputs)  # (None, 128, 64, 64)
-
-        inner = BatchNormalization()(inner)
-
-        inner = Activation('relu')(inner)
-
-        inner = MaxPooling2D(
-            pool_size=(2, 2), name='max1')(inner)  # (None,64, 32, 64)
-
-        inner = Conv2D(
-            128, (3, 3),
-            padding='same',
-            name='conv2',
-            kernel_initializer='he_normal')(inner)  # (None, 64, 32, 128)
-
-        inner = BatchNormalization()(inner)
-
-        inner = Activation('relu')(inner)
-
-        inner = MaxPooling2D(
-            pool_size=(2, 2), name='max2')(inner)  # (None, 32, 16, 128)
-
-        inner = Conv2D(
-            256, (3, 3),
-            padding='same',
-            name='conv3',
-            kernel_initializer='he_normal')(inner)  # (None, 32, 16, 256)
-
-        inner = BatchNormalization()(inner)
-
-        inner = Activation('relu')(inner)
-
-        inner = Conv2D(
-            256, (3, 3),
-            padding='same',
-            name='conv4',
-            kernel_initializer='he_normal')(inner)  # (None, 32, 16, 256)
-
-        inner = BatchNormalization()(inner)
-
-        inner = Activation('relu')(inner)
-
-        inner = MaxPooling2D(
-            pool_size=(1, 2), name='max3')(inner)  # (None, 32, 8, 256)
-
-        inner = Conv2D(
-            512, (3, 3),
-            padding='same',
-            name='conv5',
-            kernel_initializer='he_normal')(inner)  # (None, 32, 8, 512)
-
-        inner = BatchNormalization()(inner)
-
-        inner = Activation('relu')(inner)
-
-        inner = Conv2D(
-            512, (3, 3), padding='same',
-            name='conv6')(inner)  # (None, 32, 8, 512)
-
-        inner = BatchNormalization()(inner)
-
-        inner = Activation('relu')(inner)
-
-        inner = MaxPooling2D(
-            pool_size=(1, 2), name='max4')(inner)  # (None, 32, 4, 512)
-
-        inner = Conv2D(
-            512, (2, 2),
-            padding='same',
-            kernel_initializer='he_normal',
-            name='con7')(inner)  # (None, 32, 4, 512)
-
-        inner = BatchNormalization()(inner)
-
-        inner = Activation('relu')(inner)
+        features = self._feature_extractor.extract_features(input_image)
 
         # CNN to RNN
         inner = Reshape(
             target_shape=((32, 2048)),
-            name='reshape')(inner)  # (None, 32, 2048)
+            name='reshape')(features)  # (None, 32, 2048)
 
         inner = Dense(
             64,
@@ -222,7 +143,7 @@ class BaseModel(object):
 
         if is_training:
             return Model(
-                inputs=[inputs, labels, input_length, label_length],
+                inputs=[input_image, labels, input_length, label_length],
                 outputs=loss_out)
         else:
-            return Model(inputs=[inputs], outputs=y_pred)
+            return Model(inputs=[input_image], outputs=y_pred)
