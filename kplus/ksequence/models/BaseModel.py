@@ -45,6 +45,7 @@ class BaseModel(object):
 
     def __init__(self):
         self._feature_extractor = None
+        self._input_shape = (img_w, img_h, 1)  # (128, 64, 1)
 
     @classmethod
     def name(cls):
@@ -52,7 +53,7 @@ class BaseModel(object):
 
     def use_feature_extractor(self, feature_extractor):
         self._feature_extractor = ModelFactory.simple_model(
-            feature_extractor, input_shape=(img_w, img_h, 1))
+            feature_extractor, input_shape=self._input_shape)
 
     def loss_function(self, args):
         y_pred, labels, input_length, label_length = args
@@ -62,11 +63,10 @@ class BaseModel(object):
         return K.ctc_batch_cost(labels, y_pred, input_length, label_length)
 
     def keras_model(self, is_training):
-        input_shape = (img_w, img_h, 1)  # (128, 64, 1)
 
         # Make Networkw
         input_image = Input(
-            name='the_input', shape=input_shape,
+            name='the_input', shape=self._input_shape,
             dtype='float32')  # (None, 128, 64, 1)
 
         features = self._feature_extractor.extract_features(input_image)

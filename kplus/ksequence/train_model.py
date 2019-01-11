@@ -50,6 +50,13 @@ def parse_arguments(argv):
         default='base')
 
     parser.add_argument(
+        '--feature_extractor',
+        type=str,
+        help='The name of the feature extractor.',
+        choices=['simple_vgg', 'resnet_50'],
+        default='simple_vgg')
+
+    parser.add_argument(
         '--max_number_of_epoch',
         type=int,
         help='The maximum number of training epoch.',
@@ -76,6 +83,10 @@ def main(args):
             'The model name should be either base, bidirectional or attention.'
         )
 
+    if (not (args.feature_extractor in ['simple_vgg', 'resnet_50'])):
+        raise ValueError(
+            'The feature extractor should be either simple_vgg, or resnet_50.')
+
     if (not args.train_dataset_dir):
         raise ValueError(
             'You must supply the train dataset directory with --train_dataset_dir.'
@@ -89,8 +100,8 @@ def main(args):
     valid_file_path = args.test_dataset_dir
     epoch = args.max_number_of_epoch
 
-    sequence_model = ModelFactory.simple_model('base')
-    sequence_model.use_feature_extractor('simple_vgg')
+    sequence_model = ModelFactory.simple_model(args.model_name)
+    sequence_model.use_feature_extractor(args.feature_extractor)
     keras_model = sequence_model.keras_model(is_training=True)
 
     try:
