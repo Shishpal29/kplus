@@ -25,12 +25,6 @@ from __future__ import division
 from __future__ import print_function
 
 from keras import backend as K
-from keras.layers import Conv2D, MaxPooling2D
-from keras.layers import Input, Dense, Activation
-from keras.layers import Reshape, Lambda, BatchNormalization
-from keras.layers.merge import add, concatenate
-from keras.models import Model
-from keras.layers.recurrent import LSTM
 
 from kplus.ksequence.parameter import *
 
