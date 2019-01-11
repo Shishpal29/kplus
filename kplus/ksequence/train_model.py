@@ -46,7 +46,7 @@ def parse_arguments(argv):
         '--model_name',
         type=str,
         help='The name of the model.',
-        choices=['base', 'bidirectional', 'ONet'],
+        choices=['base', 'bidirectional', 'attention'],
         default='base')
 
     parser.add_argument(
@@ -54,11 +54,13 @@ def parse_arguments(argv):
         type=int,
         help='The maximum number of training epoch.',
         default=30)
+
     parser.add_argument(
         '--train_dataset_dir',
         type=str,
         help='The directory where the train dataset files are stored.',
         default='./datasets/train/')
+
     parser.add_argument(
         '--test_dataset_dir',
         type=str,
@@ -69,6 +71,11 @@ def parse_arguments(argv):
 
 
 def main(args):
+    if (not (args.model_name in ['base', 'bidirectional', 'attention'])):
+        raise ValueError(
+            'The model name should be either base, bidirectional or attention.'
+        )
+
     if (not args.train_dataset_dir):
         raise ValueError(
             'You must supply the train dataset directory with --train_dataset_dir.'
