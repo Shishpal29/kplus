@@ -41,6 +41,14 @@ K.set_learning_phase(0)
 
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        '--model_name',
+        type=str,
+        help='The name of the model.',
+        choices=['base', 'bidirectional', 'ONet'],
+        default='base')
+
     parser.add_argument(
         '--max_number_of_epoch',
         type=int,
