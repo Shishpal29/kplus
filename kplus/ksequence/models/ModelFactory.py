@@ -33,10 +33,10 @@ class ModelFactory(object):
         pass
 
     @classmethod
-    def get_model(cls, name, is_training):
-        if (name == BaseModel.name()):
-            return (BaseModel.get_model(is_training))
-        elif (name == BidirectionalModel.name()):
-            return (BidirectionalModel.get_model(is_training))
+    def simple_model(cls, model_name):
+        if (model_name == BaseModel.name()):
+            return (BaseModel())
+        elif (model_name == BidirectionalModel.name()):
+            return (BidirectionalModel())
         else:
-            return (BaseModel.get_model(is_training))
+            return (BaseModel())

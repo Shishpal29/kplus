@@ -50,6 +50,5 @@ class BidirectionalModel(BaseModel):
     def name(cls):
         return (BidirectionalModel.__name)
 
-    @classmethod
-    def get_model(cls, is_training):
+    def keras_model(self, is_training):
         return (None)

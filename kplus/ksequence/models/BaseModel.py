@@ -48,17 +48,14 @@ class BaseModel(object):
     def name(cls):
         return (BaseModel.__name)
 
-    @classmethod
-    # # Loss and train functions, network architecture
-    def ctc_lambda_func(cls, args):
+    def loss_function(self, args):
         y_pred, labels, input_length, label_length = args
         # the 2 is critical here since the first couple outputs of the RNN
         # tend to be garbage:
         y_pred = y_pred[:, 2:, :]
         return K.ctc_batch_cost(labels, y_pred, input_length, label_length)
 
-    @classmethod
-    def get_model(cls, is_training):
+    def keras_model(self, is_training):
         input_shape = (img_w, img_h, 1)  # (128, 64, 1)
 
         # Make Networkw
@@ -213,7 +210,7 @@ class BaseModel(object):
         # Keras doesn't currently support loss funcs with extra parameters
         # so CTC loss is implemented in a lambda layer
         loss_out = Lambda(
-            BaseModel.ctc_lambda_func, output_shape=(1, ),
+            self.loss_function, output_shape=(1, ),
             name='ctc')([y_pred, labels, input_length,
                          label_length])  #(None, 1)
 

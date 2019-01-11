@@ -74,11 +74,11 @@ def main(args):
     valid_file_path = args.test_dataset_dir
     epoch = args.max_number_of_epoch
 
-    # # Model description and training
-    model = ModelFactory.get_model('base', is_training=True)
+    sequence_model = ModelFactory.simple_model('base')
+    keras_model = sequence_model.keras_model(is_training=True)
 
     try:
-        model.load_weights('LSTM+BN4--26--0.011.hdf5')
+        keras_model.load_weights('LSTM+BN4--26--0.011.hdf5')
         print("...Previous weight data...")
     except:
         print("...New weight data...")
@@ -95,7 +95,7 @@ def main(args):
     ada = Adadelta()
 
     # the loss calc occurs elsewhere, so use a dummy lambda func for the loss
-    model.compile(
+    keras_model.compile(
         loss={
             'ctc': lambda y_true, y_pred: y_pred
         },
@@ -119,7 +119,7 @@ def main(args):
         write_images=False)
 
     # captures output of softmax so we can decode the output during visualization
-    model.fit_generator(
+    keras_model.fit_generator(
         generator=tiger_train.next_batch(),
         steps_per_epoch=int(tiger_train.n / batch_size),
         callbacks=[checkpoint, early_stop, tensor_board],
