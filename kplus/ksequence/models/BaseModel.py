@@ -54,13 +54,13 @@ class BaseModel(object):
         self._feature_extractor = ModelFactory.simple_model(feature_extractor)
         self._feature_extractor.build(input_shape=self._input_shape)
 
-    def loss_function(self, args):
-        y_pred, input_labels, input_length, label_length = args
+    def loss_function(self, inputs):
+        input_labels, predicted_output, input_length, label_length = inputs
         # the 2 is critical here since the first couple outputs of the RNN
         # tend to be garbage:
-        y_pred = y_pred[:, 2:, :]
-        return K.ctc_batch_cost(input_labels, y_pred, input_length,
-                                label_length)
+        predicted_output = predicted_output[:, 2:, :]
+        return (K.ctc_batch_cost(input_labels, predicted_output, input_length,
+                                 label_length))
 
     def keras_model(self, is_training):
 
@@ -121,7 +121,7 @@ class BaseModel(object):
             num_classes, kernel_initializer='he_normal',
             name='dense2')(lstm2_merged)  #(None, 32, 63)
 
-        y_pred = Activation('softmax', name='softmax')(inner)
+        predicted_output = Activation('softmax', name='softmax')(inner)
 
         input_labels = Input(
             name='the_labels', shape=[max_text_len],
@@ -133,14 +133,14 @@ class BaseModel(object):
         label_length = Input(
             name='label_length', shape=[1], dtype='int64')  # (None, 1)
 
-        loss_out = Lambda(
-            self.loss_function, output_shape=(1, ),
-            name='ctc')([y_pred, input_labels, input_length,
-                         label_length])  #(None, 1)
+        output_loss = Lambda(
+            self.loss_function, output_shape=(1, ), name='ctc')(
+                [input_labels, predicted_output, input_length,
+                 label_length])  #(None, 1)
 
         if (is_training):
             return Model(
                 inputs=[input_image, input_labels, input_length, label_length],
-                outputs=loss_out)
+                outputs=output_loss)
         else:
-            return Model(inputs=[input_image], outputs=y_pred)
+            return Model(inputs=[input_image], outputs=predicted_output)

@@ -127,7 +127,7 @@ def main(args):
 
     ada = Adadelta()
 
-    # the loss calc occurs elsewhere, so use a dummy lambda func for the loss
+    # Dummy lambda function for the loss
     keras_model.compile(
         loss={
             'ctc': lambda y_true, y_pred: y_pred
@@ -156,7 +156,6 @@ def main(args):
         write_graph=True,
         write_images=False)
 
-    # captures output of softmax so we can decode the output during visualization
     keras_model.fit_generator(
         generator=tiger_train.next_batch(),
         steps_per_epoch=int(tiger_train.n / batch_size),
