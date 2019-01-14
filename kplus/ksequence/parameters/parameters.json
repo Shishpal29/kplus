@@ -6,32 +6,5 @@
     "train_root_dir" : "./train",
     "max_number_of_epoch" : 30,
     "train_dataset_dir" : "./datasets/train/",
-    "test_dataset_dir" : "./datasets/test/",
- 
-    "train": {
-        "train_image_folder":   "/home/andy/data/kangaroo/images/",
-        "train_annot_folder":   "/home/andy/data/kangaroo/annots/",     
-          
-        "train_times":          8,
-        "pretrained_weights":   "full_yolo_kangaroo3.h5",
-        "batch_size":           16,
-        "learning_rate":        1e-4,
-        "nb_epochs":            1,
-        "warmup_epochs":        3,
-
-        "object_scale":         5.0 ,
-        "no_object_scale":      1.0,
-        "coord_scale":          1.0,
-        "class_scale":          1.0,
-
-        "saved_weights_name":   "full_yolo_kangaroo.h5",
-        "debug":                true
-    },
-
-    "validation": {
-        "valid_image_folder":   "",
-        "valid_annot_folder":   "",
-
-        "valid_times":          1
-    }
+    "test_dataset_dir" : "./datasets/test/" 
 }
