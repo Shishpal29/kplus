@@ -31,7 +31,6 @@ import numpy as np
 from kplus.ksequence.parameter import letters
 
 
-# # Input data generator
 def labels_to_text(labels):  # letters index -> text (string)
     return ''.join(list(map(lambda x: letters[int(x)], labels)))
 
@@ -100,8 +99,8 @@ class SimpleGenerator:
                 label_length[i] = len(text)
 
             inputs = {
-                'the_input': X_data,  # (bs, 128, 64, 1)
-                'the_labels': Y_data,  # (bs, 8)
+                'input_image': X_data,  # (bs, 128, 64, 1)
+                'input_labels': Y_data,  # (bs, 8)
                 'input_length': input_length,  # (bs, 1) -> value = 30
                 'label_length': label_length  # (bs, 1) -> value = 8
             }

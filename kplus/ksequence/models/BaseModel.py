@@ -65,7 +65,7 @@ class BaseModel(object):
     def keras_model(self, is_training):
 
         input_image = Input(
-            name='the_input', shape=self._input_shape,
+            name='input_image', shape=self._input_shape,
             dtype='float32')  # (None, 128, 64, 1)
 
         features = self._feature_extractor.extract_features(input_image)
@@ -124,7 +124,7 @@ class BaseModel(object):
         predicted_output = Activation('softmax', name='softmax')(inner)
 
         input_labels = Input(
-            name='the_labels', shape=[max_text_len],
+            name='input_labels', shape=[max_text_len],
             dtype='float32')  # (None ,9)
 
         input_length = Input(
