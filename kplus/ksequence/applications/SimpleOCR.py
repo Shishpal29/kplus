@@ -30,7 +30,6 @@ from keras import backend as K
 K.set_learning_phase(0)
 
 from keras.optimizers import Adadelta
-from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
 
 from kplus.ksequence.datasets.SimpleGenerator import SimpleGenerator
 from kplus.ksequence.models.ModelFactory import ModelFactory
@@ -43,17 +42,18 @@ class SimpleOCR(AbstractApplication):
     def __init__(self):
         pass
 
-    def _setup_early_stop(self):
-        pass
+    def _setup_train_dataset(self, train_dataset_dir):
+        self._train_dataset_generator = SimpleGenerator(
+            train_dataset_dir, img_w, img_h, batch_size, downsample_factor)
+        self._train_dataset_generator.build_data()
+        return (True)
 
-    def _setup_model_checkpoint(self):
-        pass
-
-    def _setup_tensorboard(self):
-        pass
-
-    def _change_learning_rate(self):
-        pass
+    def _setup_test_dataset(self, test_dataset_dir):
+        test_batch_size = val_batch_size
+        self._test_dataset_generator = SimpleGenerator(
+            test_dataset_dir, img_w, img_h, test_batch_size, downsample_factor)
+        self._test_dataset_generator.build_data()
+        return (True)
 
     def train(self, parameters):
 
@@ -64,10 +64,6 @@ class SimpleOCR(AbstractApplication):
         feature_extractor = parameters['model']['feature_extractor']
         if (not (feature_extractor in ['simple_vgg', 'resnet_50'])):
             return (False)
-
-        train_file_path = parameters['train_dataset_dir']
-        valid_file_path = parameters['test_dataset_dir']
-        epoch = parameters['max_number_of_epoch']
 
         sequence_model = ModelFactory.simple_model(model_name)
         sequence_model.use_feature_extractor(feature_extractor)
@@ -80,14 +76,6 @@ class SimpleOCR(AbstractApplication):
             print("...New weight data...")
             pass
 
-        tiger_train = SimpleGenerator(train_file_path, img_w, img_h,
-                                      batch_size, downsample_factor)
-        tiger_train.build_data()
-
-        tiger_val = SimpleGenerator(valid_file_path, img_w, img_h,
-                                    val_batch_size, downsample_factor)
-        tiger_val.build_data()
-
         ada = Adadelta()
 
         # Dummy lambda function for the loss
@@ -98,36 +86,33 @@ class SimpleOCR(AbstractApplication):
             optimizer=ada,
             metrics=['accuracy'])
 
-        early_stop = EarlyStopping(
-            monitor='loss', min_delta=0.001, patience=4, mode='min', verbose=1)
-
         train_root_dir = os.path.expanduser(parameters['train_root_dir'])
         checkpoint_path = os.path.join(
             train_root_dir, 'model--{epoch:03d}--{val_loss:.5f}.hdf5')
         tensorboard_path = os.path.join(train_root_dir, 'tensorboard')
 
-        checkpoint = ModelCheckpoint(
-            filepath=checkpoint_path,
-            monitor='loss',
-            verbose=1,
-            mode='min',
-            period=1)
+        status = True
+        status = self._setup_early_stop() and self._setup_model_checkpoint(
+            checkpoint_path) and self._setup_tensorboard(
+                tensorboard_path) and self._change_learning_rate() and status
 
-        tensor_board = TensorBoard(
-            log_dir=tensorboard_path,
-            histogram_freq=0,
-            write_graph=True,
-            write_images=False)
+        train_dataset_dir = parameters['train_dataset_dir']
+        test_dataset_dir = parameters['test_dataset_dir']
+        status = self._setup_train_dataset(
+            train_dataset_dir) and self._setup_test_dataset(
+                test_dataset_dir) and status
 
+        epoch = parameters['max_number_of_epoch']
         keras_model.fit_generator(
-            generator=tiger_train.next_batch(),
-            steps_per_epoch=int(tiger_train.n / batch_size),
-            callbacks=[checkpoint, early_stop, tensor_board],
+            generator=self._train_dataset_generator.next_batch(),
+            steps_per_epoch=int(self._train_dataset_generator.n / batch_size),
+            callbacks=[self._checkpoint, self._early_stop, self._tensorboard],
             epochs=epoch,
-            validation_data=tiger_val.next_batch(),
-            validation_steps=int(tiger_val.n / val_batch_size))
+            validation_data=self._test_dataset_generator.next_batch(),
+            validation_steps=int(
+                self._test_dataset_generator.n / val_batch_size))
 
-        return (True)
+        return (status)
 
     def evaluate(self, parameters):
         pass
