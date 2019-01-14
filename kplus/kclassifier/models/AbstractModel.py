@@ -26,10 +26,13 @@ from __future__ import print_function
 
 
 class AbstractModel(object):
-    def __init__(self, input_size):
+    def __init__(self):
         self.feature_extractor = None
 
-    def normalize(self, image):
+    def build(self, input_shape):
+        raise NotImplementedError('Must be implemented by the subclass.')
+
+    def normalize(self, input_image):
         raise NotImplementedError('Must be implemented by the subclass.')
 
     def get_output_shape(self):

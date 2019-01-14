@@ -33,10 +33,10 @@ class ModelFactory(object):
         pass
 
     @classmethod
-    def simple_model(cls, model_name, input_shape):
+    def simple_model(cls, model_name):
         if (model_name == ResNet50Model.name()):
-            return (ResNet50Model(input_shape))
+            return (ResNet50Model())
         elif (model_name == SimpleVGGModel.name()):
-            return (SimpleVGGModel(input_shape))
+            return (SimpleVGGModel())
         else:
-            return (ResNet50Model(input_shape))
+            return (ResNet50Model())

@@ -41,18 +41,21 @@ class SimpleVGGModel(AbstractModel):
     def name(cls):
         return (SimpleVGGModel.__name)
 
-    def __init__(self, input_shape):
-        # Make Networkw
-        input_image = Input(
-            name='the_input', shape=input_shape,
+    def __init__(self):
+        pass
+
+    def build(self, input_shape):
+
+        simple_vgg_input = Input(
+            name='simple_vgg_input', shape=input_shape,
             dtype='float32')  # (None, 128, 64, 1)
 
-        # Convolution layer (VGG)
         inner = Conv2D(
             64, (3, 3),
             padding='same',
             name='conv1',
-            kernel_initializer='he_normal')(input_image)  # (None, 128, 64, 64)
+            kernel_initializer='he_normal')(
+                simple_vgg_input)  # (None, 128, 64, 64)
 
         inner = BatchNormalization()(inner)
 
@@ -126,9 +129,10 @@ class SimpleVGGModel(AbstractModel):
 
         inner = BatchNormalization()(inner)
 
-        model_output = Activation('relu')(inner)
+        simple_vgg_output = Activation('relu')(inner)
 
-        self.feature_extractor = Model(input_image, model_output)
+        self.feature_extractor = Model(simple_vgg_input, simple_vgg_output)
 
-    def normalize(self, image):
-        return (image)
+    def normalize(self, input_image):
+        normalized_image = input_image
+        return (normalized_image)
