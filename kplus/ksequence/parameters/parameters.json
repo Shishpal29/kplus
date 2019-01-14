@@ -6,5 +6,7 @@
     "train_root_dir" : "./train",
     "max_number_of_epoch" : 30,
     "train_dataset_dir" : "./datasets/train/",
-    "test_dataset_dir" : "./datasets/test/" 
+    "test_dataset_dir" : "./datasets/test/",
+    "train_model_name" : "model--{epoch:03d}.hdf5",
+    "test_model_name" : "model--{epoch:030}.hdf5"    
 }

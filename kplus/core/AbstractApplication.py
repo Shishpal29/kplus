@@ -24,17 +24,46 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import os
+
 from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
 
 
 class AbstractApplication(object):
     def __init__(self):
+        self._keras_model = None
+
         self._checkpoint = None
         self._early_stop = None
         self._tensorboard = None
 
         self._train_dataset_generator = None
         self._test_dataset_generator = None
+
+    def _setup_model(self, parameters, is_training):
+        return (False)
+
+    def _setup_callbacks(self, parameters):
+
+        train_root_dir = os.path.expanduser(parameters['train_root_dir'])
+        checkpoint_path = os.path.join(train_root_dir,
+                                       parameters['train_model_name'])
+        tensorboard_path = os.path.join(train_root_dir, 'tensorboard')
+
+        status = True
+        status = self._setup_early_stop() and self._setup_model_checkpoint(
+            checkpoint_path) and self._setup_tensorboard(
+                tensorboard_path) and self._change_learning_rate() and status
+        return (status)
+
+    def _setup_datasets(self, parameters):
+        status = True
+        train_dataset_dir = parameters['train_dataset_dir']
+        test_dataset_dir = parameters['test_dataset_dir']
+        status = self._setup_train_dataset(
+            train_dataset_dir) and self._setup_test_dataset(
+                test_dataset_dir) and status
+        return (status)
 
     def _setup_early_stop(self):
         self._early_stop = EarlyStopping(

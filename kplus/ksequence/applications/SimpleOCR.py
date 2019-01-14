@@ -42,6 +42,36 @@ class SimpleOCR(AbstractApplication):
     def __init__(self):
         pass
 
+    def _setup_model(self, parameters, is_training):
+        model_name = parameters['model']['model_name']
+        if (not (model_name in ['base', 'bidirectional', 'attention'])):
+            return (False)
+
+        feature_extractor = parameters['model']['feature_extractor']
+        if (not (feature_extractor in ['simple_vgg', 'resnet_50'])):
+            return (False)
+
+        sequence_model = ModelFactory.simple_model(model_name)
+        sequence_model.use_feature_extractor(feature_extractor)
+        self._keras_model = sequence_model.keras_model(is_training)
+
+        try:
+            self._keras_model.load_weights(parameters['test_model_name'])
+        except:
+            pass
+
+        optimizer = Adadelta()
+
+        # Dummy lambda function for the loss
+        self._keras_model.compile(
+            loss={
+                'ctc': lambda y_true, y_pred: y_pred
+            },
+            optimizer=optimizer,
+            metrics=['accuracy'])
+
+        return (True)
+
     def _setup_train_dataset(self, train_dataset_dir):
         self._train_dataset_generator = SimpleGenerator(
             train_dataset_dir, img_w, img_h, batch_size, downsample_factor)
@@ -57,53 +87,21 @@ class SimpleOCR(AbstractApplication):
 
     def train(self, parameters):
 
-        model_name = parameters['model']['model_name']
-        if (not (model_name in ['base', 'bidirectional', 'attention'])):
-            return (False)
-
-        feature_extractor = parameters['model']['feature_extractor']
-        if (not (feature_extractor in ['simple_vgg', 'resnet_50'])):
-            return (False)
-
-        sequence_model = ModelFactory.simple_model(model_name)
-        sequence_model.use_feature_extractor(feature_extractor)
-        keras_model = sequence_model.keras_model(is_training=True)
-
-        try:
-            keras_model.load_weights('LSTM+BN4--26--0.011.hdf5')
-            print("...Previous weight data...")
-        except:
-            print("...New weight data...")
-            pass
-
-        ada = Adadelta()
-
-        # Dummy lambda function for the loss
-        keras_model.compile(
-            loss={
-                'ctc': lambda y_true, y_pred: y_pred
-            },
-            optimizer=ada,
-            metrics=['accuracy'])
-
-        train_root_dir = os.path.expanduser(parameters['train_root_dir'])
-        checkpoint_path = os.path.join(
-            train_root_dir, 'model--{epoch:03d}--{val_loss:.5f}.hdf5')
-        tensorboard_path = os.path.join(train_root_dir, 'tensorboard')
-
         status = True
-        status = self._setup_early_stop() and self._setup_model_checkpoint(
-            checkpoint_path) and self._setup_tensorboard(
-                tensorboard_path) and self._change_learning_rate() and status
+        status = self._setup_model(parameters, is_training=True) and status
+        if (not status):
+            return (False)
 
-        train_dataset_dir = parameters['train_dataset_dir']
-        test_dataset_dir = parameters['test_dataset_dir']
-        status = self._setup_train_dataset(
-            train_dataset_dir) and self._setup_test_dataset(
-                test_dataset_dir) and status
+        status = self._setup_datasets(parameters) and status
+        if (not status):
+            return (False)
+
+        status = self._setup_callbacks(parameters) and status
+        if (not status):
+            return (False)
 
         epoch = parameters['max_number_of_epoch']
-        keras_model.fit_generator(
+        self._keras_model.fit_generator(
             generator=self._train_dataset_generator.next_batch(),
             steps_per_epoch=int(self._train_dataset_generator.n / batch_size),
             callbacks=[self._checkpoint, self._early_stop, self._tensorboard],
