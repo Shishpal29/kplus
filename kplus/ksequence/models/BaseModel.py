@@ -55,11 +55,12 @@ class BaseModel(object):
         self._feature_extractor.build(input_shape=self._input_shape)
 
     def loss_function(self, args):
-        y_pred, labels, input_length, label_length = args
+        y_pred, input_labels, input_length, label_length = args
         # the 2 is critical here since the first couple outputs of the RNN
         # tend to be garbage:
         y_pred = y_pred[:, 2:, :]
-        return K.ctc_batch_cost(labels, y_pred, input_length, label_length)
+        return K.ctc_batch_cost(input_labels, y_pred, input_length,
+                                label_length)
 
     def keras_model(self, is_training):
 
@@ -115,14 +116,14 @@ class BaseModel(object):
 
         lstm_merged = BatchNormalization()(lstm2_merged)
 
-        # transforms RNN output to character activations:
+        # RNN to output prediction
         inner = Dense(
             num_classes, kernel_initializer='he_normal',
             name='dense2')(lstm2_merged)  #(None, 32, 63)
 
         y_pred = Activation('softmax', name='softmax')(inner)
 
-        labels = Input(
+        input_labels = Input(
             name='the_labels', shape=[max_text_len],
             dtype='float32')  # (None ,9)
 
@@ -134,12 +135,12 @@ class BaseModel(object):
 
         loss_out = Lambda(
             self.loss_function, output_shape=(1, ),
-            name='ctc')([y_pred, labels, input_length,
+            name='ctc')([y_pred, input_labels, input_length,
                          label_length])  #(None, 1)
 
-        if is_training:
+        if (is_training):
             return Model(
-                inputs=[input_image, labels, input_length, label_length],
+                inputs=[input_image, input_labels, input_length, label_length],
                 outputs=loss_out)
         else:
             return Model(inputs=[input_image], outputs=y_pred)
