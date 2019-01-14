@@ -41,11 +41,11 @@ class AbstractApplication(object):
     def _change_learning_rate(self):
         pass
 
-    def train(self):
-        pass
+    def train(self, parameters):
+        raise NotImplementedError('Must be implemented by the subclass.')
 
-    def evaluate(self):
-        pass
+    def evaluate(self, parameters):
+        raise NotImplementedError('Must be implemented by the subclass.')
 
-    def predict(self):
-        pass
+    def predict(self, input_image):
+        raise NotImplementedError('Must be implemented by the subclass.')

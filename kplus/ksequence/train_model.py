@@ -28,17 +28,12 @@ import sys
 import os
 import argparse
 
-from keras import backend as K
-from keras.optimizers import Adadelta
-from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
+import json
 
-from kplus.ksequence.datasets.SimpleGenerator import SimpleGenerator
-from kplus.ksequence.models.ModelFactory import ModelFactory
-from kplus.ksequence.parameter import *
+from kplus.ksequence.applications.SimpleOCR import SimpleOCR
 
 K.set_learning_phase(0)
-
-
+"""
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
 
@@ -163,6 +158,29 @@ def main(args):
         epochs=epoch,
         validation_data=tiger_val.next_batch(),
         validation_steps=int(tiger_val.n / val_batch_size))
+"""
+
+
+def parse_arguments(argv):
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        '--parameter_filename',
+        type=str,
+        help='Input parameter file name.',
+        default='./parameters/parameters.json')
+
+    return (parser.parse_args(argv))
+
+
+def main(args):
+    parameter_filename = args.parameter_filename
+
+    with open(parameter_filename) as input_buffer:
+        parameters = json.loads(input_buffer.read())
+
+    application = SimpleOCR()
+    application.train(parameters)
 
 
 if __name__ == '__main__':
