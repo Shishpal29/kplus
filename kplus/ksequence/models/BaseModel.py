@@ -51,8 +51,8 @@ class BaseModel(object):
         return (BaseModel.__name)
 
     def use_feature_extractor(self, feature_extractor):
-        self._feature_extractor = ModelFactory.simple_model(
-            feature_extractor, input_shape=self._input_shape)
+        self._feature_extractor = ModelFactory.simple_model(feature_extractor)
+        self._feature_extractor.build(input_shape=self._input_shape)
 
     def loss_function(self, args):
         y_pred, labels, input_length, label_length = args
@@ -63,7 +63,6 @@ class BaseModel(object):
 
     def keras_model(self, is_training):
 
-        # Make Networkw
         input_image = Input(
             name='the_input', shape=self._input_shape,
             dtype='float32')  # (None, 128, 64, 1)
@@ -133,8 +132,6 @@ class BaseModel(object):
         label_length = Input(
             name='label_length', shape=[1], dtype='int64')  # (None, 1)
 
-        # Keras doesn't currently support loss funcs with extra parameters
-        # so CTC loss is implemented in a lambda layer
         loss_out = Lambda(
             self.loss_function, output_shape=(1, ),
             name='ctc')([y_pred, labels, input_length,
