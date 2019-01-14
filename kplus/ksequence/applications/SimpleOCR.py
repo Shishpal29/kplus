@@ -85,21 +85,7 @@ class SimpleOCR(AbstractApplication):
         self._test_dataset_generator.build_data()
         return (True)
 
-    def train(self, parameters):
-
-        status = True
-        status = self._setup_model(parameters, is_training=True) and status
-        if (not status):
-            return (False)
-
-        status = self._setup_datasets(parameters) and status
-        if (not status):
-            return (False)
-
-        status = self._setup_callbacks(parameters) and status
-        if (not status):
-            return (False)
-
+    def _train_model(self, parameters):
         epoch = parameters['max_number_of_epoch']
         self._keras_model.fit_generator(
             generator=self._train_dataset_generator.next_batch(),
@@ -110,7 +96,7 @@ class SimpleOCR(AbstractApplication):
             validation_steps=int(
                 self._test_dataset_generator.n / val_batch_size))
 
-        return (status)
+        return (True)
 
     def evaluate(self, parameters):
         pass
