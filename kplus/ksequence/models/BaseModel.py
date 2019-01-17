@@ -56,8 +56,6 @@ class BaseModel(object):
 
     def _loss_function(self, inputs):
         input_labels, predicted_output, input_length, label_length = inputs
-        # the 2 is critical here since the first couple outputs of the RNN
-        # tend to be garbage:
         predicted_output = predicted_output[:, 2:, :]
         return (K.ctc_batch_cost(input_labels, predicted_output, input_length,
                                  label_length))
@@ -85,6 +83,7 @@ class BaseModel(object):
         return (layer_output)
 
     def _decode_sequence(self, layer_input):
+        # RNN decoder layer
         forward_lstm = LSTM(
             256,
             return_sequences=True,
