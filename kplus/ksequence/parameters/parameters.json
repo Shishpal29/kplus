@@ -1,12 +1,18 @@
 {
     "model" : {
-        "model_name":"base",
-        "feature_extractor":"simple_vgg"
+		"model_name":"base",
+		"feature_extractor":"simple_vgg"
     },
-    "train_root_dir" : "./train",
-    "max_number_of_epoch" : 30,
-    "train_dataset_dir" : "./datasets/train/",
-    "test_dataset_dir" : "./datasets/test/",
-    "train_model_name" : "model--{epoch:03d}.hdf5",
-    "test_model_name" : "model--{epoch:030}.hdf5"    
+
+    "train" : {	    
+		"max_number_of_epoch" : 30,
+		"dataset_dir" : "./datasets/train/",
+		"train_root_dir" : "./train",
+		"model_name" : "model--{epoch:03d}.hdf5"
+    },
+
+    "test" : {	    
+		"dataset_dir" : "./datasets/test/",
+		"model_name" : "model--{epoch:030}.hdf5"    
+    }
 }

@@ -56,7 +56,7 @@ class SimpleOCR(AbstractApplication):
         self._keras_model = sequence_model.keras_model(is_training)
 
         try:
-            self._keras_model.load_weights(parameters['test_model_name'])
+            self._keras_model.load_weights(parameters['test']['model_name'])
         except:
             pass
 
@@ -86,7 +86,7 @@ class SimpleOCR(AbstractApplication):
         return (True)
 
     def _train_model(self, parameters):
-        epoch = parameters['max_number_of_epoch']
+        epoch = parameters['train']['max_number_of_epoch']
         self._keras_model.fit_generator(
             generator=self._train_dataset_generator.next_batch(),
             steps_per_epoch=int(self._train_dataset_generator.n / batch_size),

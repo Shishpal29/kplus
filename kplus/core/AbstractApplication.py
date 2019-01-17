@@ -45,9 +45,10 @@ class AbstractApplication(object):
 
     def _setup_callbacks(self, parameters):
 
-        train_root_dir = os.path.expanduser(parameters['train_root_dir'])
+        train_root_dir = os.path.expanduser(
+            parameters['train']['train_root_dir'])
         checkpoint_path = os.path.join(train_root_dir,
-                                       parameters['train_model_name'])
+                                       parameters['train']['model_name'])
         tensorboard_path = os.path.join(train_root_dir, 'tensorboard')
 
         status = True
@@ -58,8 +59,8 @@ class AbstractApplication(object):
 
     def _setup_datasets(self, parameters):
         status = True
-        train_dataset_dir = parameters['train_dataset_dir']
-        test_dataset_dir = parameters['test_dataset_dir']
+        train_dataset_dir = parameters['train']['dataset_dir']
+        test_dataset_dir = parameters['test']['dataset_dir']
         status = self._setup_train_dataset(
             train_dataset_dir) and self._setup_test_dataset(
                 test_dataset_dir) and status
