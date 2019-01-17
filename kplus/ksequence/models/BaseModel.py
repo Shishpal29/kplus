@@ -64,24 +64,23 @@ class BaseModel(object):
 
     def _encode_sequence(self, layer_input):
         # RNN encoder layer
-        lstm_1 = LSTM(
+        forward_lstm = LSTM(
             256,
             return_sequences=True,
             kernel_initializer='he_normal',
-            name='lstm1')(layer_input)  # (None, 32, 512)
+            name='forward_lstm_1')(layer_input)  # (None, 32, 512)
 
-        lstm_1b = LSTM(
+        backward_lstm = LSTM(
             256,
             return_sequences=True,
             go_backwards=True,
             kernel_initializer='he_normal',
-            name='lstm1_b')(layer_input)
+            name='backward_lstm_1')(layer_input)
 
-        lstm1_merged = add([lstm_1, lstm_1b])  # (None, 32, 512)
+        merged_lstm = add([forward_lstm, backward_lstm])  # (None, 32, 512)
+        merged_lstm = BatchNormalization()(merged_lstm)
 
-        lstm1_merged = BatchNormalization()(lstm1_merged)
-
-        layer_output = lstm1_merged
+        layer_output = merged_lstm
 
         return (layer_output)
 
