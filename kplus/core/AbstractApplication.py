@@ -68,8 +68,13 @@ class AbstractApplication(object):
         return (status)
 
     def _setup_early_stop(self):
+        #self._early_stop = EarlyStopping(monitor='loss', min_delta=0.001, patience=5, mode='min', verbose=1)
         self._early_stop = EarlyStopping(
-            monitor='loss', min_delta=0.001, patience=5, mode='min', verbose=1)
+            monitor='val_loss',
+            min_delta=0.0,
+            patience=5,
+            mode='auto',
+            verbose=1)
         return (True)
 
     def _setup_model_checkpoint(self, checkpoint_path):
@@ -95,8 +100,9 @@ class AbstractApplication(object):
             factor=0.1,
             patience=5,
             verbose=1,
-            mode='min',
-            epsilon=0.01,
+            mode='auto',
+            #epsilon=0.01,
+            min_delta=0.0,
             cooldown=0,
             min_lr=0)
         return (True)
