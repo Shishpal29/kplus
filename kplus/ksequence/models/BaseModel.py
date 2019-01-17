@@ -84,6 +84,28 @@ class BaseModel(object):
 
         return (layer_output)
 
+    def _decode_sequence(self, layer_input):
+        forward_lstm = LSTM(
+            256,
+            return_sequences=True,
+            kernel_initializer='he_normal',
+            name='forward_lstm_2')(layer_input)
+
+        backward_lstm = LSTM(
+            256,
+            return_sequences=True,
+            go_backwards=True,
+            kernel_initializer='he_normal',
+            name='backward_lstm_2')(layer_input)
+
+        merged_lstm = concatenate([forward_lstm,
+                                   backward_lstm])  # (None, 32, 1024)
+        merged_lstm_2 = BatchNormalization()(merged_lstm)
+
+        layer_output = merged_lstm
+
+        return (layer_output)
+
     def keras_model(self, is_training):
 
         input_image = Input(
@@ -104,28 +126,12 @@ class BaseModel(object):
             name='dense1')(inner)  # (None, 32, 64)
 
         encoded_sequence = self._encode_sequence(inner)
-
-        lstm_2 = LSTM(
-            256,
-            return_sequences=True,
-            kernel_initializer='he_normal',
-            name='lstm2')(encoded_sequence)
-
-        lstm_2b = LSTM(
-            256,
-            return_sequences=True,
-            go_backwards=True,
-            kernel_initializer='he_normal',
-            name='lstm2_b')(encoded_sequence)
-
-        lstm2_merged = concatenate([lstm_2, lstm_2b])  # (None, 32, 1024)
-
-        lstm_merged = BatchNormalization()(lstm2_merged)
+        decoded_sequence = self._decode_sequence(encoded_sequence)
 
         # RNN to output prediction
         inner = Dense(
             num_classes, kernel_initializer='he_normal',
-            name='dense2')(lstm2_merged)  #(None, 32, 63)
+            name='dense2')(decoded_sequence)  #(None, 32, 63)
 
         predicted_output = Activation('softmax', name='softmax')(inner)
 
