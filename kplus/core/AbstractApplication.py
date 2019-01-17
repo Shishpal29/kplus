@@ -102,7 +102,7 @@ class AbstractApplication(object):
             verbose=1,
             mode='auto',
             #epsilon=0.01,
-            min_delta=0.0,
+            #min_delta=0.0,
             cooldown=0,
             min_lr=0)
         return (True)
