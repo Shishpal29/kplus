@@ -62,6 +62,29 @@ class BaseModel(object):
         return (K.ctc_batch_cost(input_labels, predicted_output, input_length,
                                  label_length))
 
+    def _encode_sequence(self, layer_input):
+        # RNN encoder layer
+        lstm_1 = LSTM(
+            256,
+            return_sequences=True,
+            kernel_initializer='he_normal',
+            name='lstm1')(layer_input)  # (None, 32, 512)
+
+        lstm_1b = LSTM(
+            256,
+            return_sequences=True,
+            go_backwards=True,
+            kernel_initializer='he_normal',
+            name='lstm1_b')(layer_input)
+
+        lstm1_merged = add([lstm_1, lstm_1b])  # (None, 32, 512)
+
+        lstm1_merged = BatchNormalization()(lstm1_merged)
+
+        layer_output = lstm1_merged
+
+        return (layer_output)
+
     def keras_model(self, is_training):
 
         input_image = Input(
@@ -81,36 +104,20 @@ class BaseModel(object):
             kernel_initializer='he_normal',
             name='dense1')(inner)  # (None, 32, 64)
 
-        # RNN layer
-        lstm_1 = LSTM(
-            256,
-            return_sequences=True,
-            kernel_initializer='he_normal',
-            name='lstm1')(inner)  # (None, 32, 512)
-
-        lstm_1b = LSTM(
-            256,
-            return_sequences=True,
-            go_backwards=True,
-            kernel_initializer='he_normal',
-            name='lstm1_b')(inner)
-
-        lstm1_merged = add([lstm_1, lstm_1b])  # (None, 32, 512)
-
-        lstm1_merged = BatchNormalization()(lstm1_merged)
+        encoded_sequence = self._encode_sequence(inner)
 
         lstm_2 = LSTM(
             256,
             return_sequences=True,
             kernel_initializer='he_normal',
-            name='lstm2')(lstm1_merged)
+            name='lstm2')(encoded_sequence)
 
         lstm_2b = LSTM(
             256,
             return_sequences=True,
             go_backwards=True,
             kernel_initializer='he_normal',
-            name='lstm2_b')(lstm1_merged)
+            name='lstm2_b')(encoded_sequence)
 
         lstm2_merged = concatenate([lstm_2, lstm_2b])  # (None, 32, 1024)
 
