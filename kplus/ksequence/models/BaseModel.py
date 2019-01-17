@@ -54,7 +54,7 @@ class BaseModel(object):
         self._feature_extractor = ModelFactory.simple_model(feature_extractor)
         self._feature_extractor.build(input_shape=self._input_shape)
 
-    def loss_function(self, inputs):
+    def _loss_function(self, inputs):
         input_labels, predicted_output, input_length, label_length = inputs
         # the 2 is critical here since the first couple outputs of the RNN
         # tend to be garbage:
@@ -134,7 +134,7 @@ class BaseModel(object):
             name='label_length', shape=[1], dtype='int64')  # (None, 1)
 
         output_loss = Lambda(
-            self.loss_function, output_shape=(1, ), name='ctc')(
+            self._loss_function, output_shape=(1, ), name='ctc')(
                 [input_labels, predicted_output, input_length,
                  label_length])  #(None, 1)
 
