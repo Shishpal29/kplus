@@ -90,7 +90,10 @@ class SimpleOCR(AbstractApplication):
         self._keras_model.fit_generator(
             generator=self._train_dataset_generator.next_batch(),
             steps_per_epoch=int(self._train_dataset_generator.n / batch_size),
-            callbacks=[self._checkpoint, self._early_stop, self._tensorboard],
+            callbacks=[
+                self._checkpoint, self._early_stop, self._change_learning_rate,
+                self._tensorboard
+            ],
             epochs=epoch,
             validation_data=self._test_dataset_generator.next_batch(),
             validation_steps=int(

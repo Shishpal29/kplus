@@ -26,7 +26,7 @@ from __future__ import print_function
 
 import os
 
-from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
+from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard, ReduceLROnPlateau
 
 
 class AbstractApplication(object):
@@ -35,6 +35,7 @@ class AbstractApplication(object):
 
         self._checkpoint = None
         self._early_stop = None
+        self._change_learning_rate = None
         self._tensorboard = None
 
         self._train_dataset_generator = None
@@ -68,7 +69,7 @@ class AbstractApplication(object):
 
     def _setup_early_stop(self):
         self._early_stop = EarlyStopping(
-            monitor='loss', min_delta=0.001, patience=4, mode='min', verbose=1)
+            monitor='loss', min_delta=0.001, patience=5, mode='min', verbose=1)
         return (True)
 
     def _setup_model_checkpoint(self, checkpoint_path):
@@ -89,6 +90,15 @@ class AbstractApplication(object):
         return (True)
 
     def _change_learning_rate(self):
+        self._change_learning_rate = ReduceLROnPlateau(
+            monitor='loss',
+            factor=0.1,
+            patience=5,
+            verbose=1,
+            mode='min',
+            epsilon=0.01,
+            cooldown=0,
+            min_lr=0)
         return (True)
 
     def _setup_train_dataset(self, train_dataset_dir):
