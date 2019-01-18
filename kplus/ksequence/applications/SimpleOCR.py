@@ -72,14 +72,14 @@ class SimpleOCR(AbstractApplication):
 
         return (True)
 
-    def _setup_train_dataset(self, train_dataset_dir):
+    def _setup_train_dataset(self, train_dataset_dir, train_batch_size):
         self._train_dataset_generator = SimpleGenerator(
-            train_dataset_dir, img_w, img_h, batch_size, downsample_factor)
+            train_dataset_dir, img_w, img_h, train_batch_size,
+            downsample_factor)
         self._train_dataset_generator.build_data()
         return (True)
 
-    def _setup_test_dataset(self, test_dataset_dir):
-        test_batch_size = val_batch_size
+    def _setup_test_dataset(self, test_dataset_dir, test_batch_size):
         self._test_dataset_generator = SimpleGenerator(
             test_dataset_dir, img_w, img_h, test_batch_size, downsample_factor)
         self._test_dataset_generator.build_data()
@@ -87,9 +87,12 @@ class SimpleOCR(AbstractApplication):
 
     def _train_model(self, parameters):
         epoch = parameters['train']['max_number_of_epoch']
+        train_batch_size = parameters['train']['batch_size']
+        test_batch_size = parameters['test']['batch_size']
         self._keras_model.fit_generator(
             generator=self._train_dataset_generator.next_batch(),
-            steps_per_epoch=int(self._train_dataset_generator.n / batch_size),
+            steps_per_epoch=int(
+                self._train_dataset_generator.n / train_batch_size),
             callbacks=[
                 self._checkpoint, self._early_stop, self._change_learning_rate,
                 self._tensorboard
@@ -97,7 +100,7 @@ class SimpleOCR(AbstractApplication):
             epochs=epoch,
             validation_data=self._test_dataset_generator.next_batch(),
             validation_steps=int(
-                self._test_dataset_generator.n / val_batch_size))
+                self._test_dataset_generator.n / test_batch_size))
 
         return (True)
 

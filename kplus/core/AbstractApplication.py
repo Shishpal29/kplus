@@ -61,10 +61,13 @@ class AbstractApplication(object):
     def _setup_datasets(self, parameters):
         status = True
         train_dataset_dir = parameters['train']['dataset_dir']
+        train_batch_size = parameters['train']['batch_size']
+
+        test_batch_size = parameters['test']['batch_size']
         test_dataset_dir = parameters['test']['dataset_dir']
         status = self._setup_train_dataset(
-            train_dataset_dir) and self._setup_test_dataset(
-                test_dataset_dir) and status
+            train_dataset_dir, train_batch_size) and self._setup_test_dataset(
+                test_dataset_dir, test_batch_size) and status
         return (status)
 
     def _setup_early_stop(self):
