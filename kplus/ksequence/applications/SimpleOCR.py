@@ -33,14 +33,15 @@ from keras.optimizers import Adadelta
 
 from kplus.ksequence.datasets.SimpleGenerator import SimpleGenerator
 from kplus.ksequence.models.ModelFactory import ModelFactory
-from kplus.ksequence.parameter import *
 
 from kplus.core.AbstractApplication import AbstractApplication
 
 
 class SimpleOCR(AbstractApplication):
     def __init__(self):
-        pass
+        self._image_width = 128
+        self._image_height = 64
+        self._downsample_factor = 4
 
     def _setup_model(self, parameters, is_training):
         model_name = parameters['model']['model_name']
@@ -53,7 +54,13 @@ class SimpleOCR(AbstractApplication):
 
         sequence_model = ModelFactory.simple_model(model_name)
         sequence_model.use_feature_extractor(feature_extractor)
-        self._keras_model = sequence_model.keras_model(is_training)
+        self._image_width = parameters['model']['image_width']
+        self._image_height = parameters['model']['image_height']
+        self._downsample_factor = parameters['model']['downsample_factor']
+
+        input_shape = (self._image_width, self._image_height, 1)
+        self._keras_model = sequence_model.keras_model(input_shape,
+                                                       is_training)
 
         try:
             self._keras_model.load_weights(parameters['test']['model_name'])
@@ -74,14 +81,15 @@ class SimpleOCR(AbstractApplication):
 
     def _setup_train_dataset(self, train_dataset_dir, train_batch_size):
         self._train_dataset_generator = SimpleGenerator(
-            train_dataset_dir, img_w, img_h, train_batch_size,
-            downsample_factor)
+            train_dataset_dir, self._image_width, self._image_height,
+            train_batch_size, self._downsample_factor)
         self._train_dataset_generator.build_data()
         return (True)
 
     def _setup_test_dataset(self, test_dataset_dir, test_batch_size):
         self._test_dataset_generator = SimpleGenerator(
-            test_dataset_dir, img_w, img_h, test_batch_size, downsample_factor)
+            test_dataset_dir, self._image_width, self._image_height,
+            test_batch_size, self._downsample_factor)
         self._test_dataset_generator.build_data()
         return (True)
 

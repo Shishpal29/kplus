@@ -44,7 +44,6 @@ class BaseModel(object):
 
     def __init__(self):
         self._feature_extractor = None
-        self._input_shape = (128, 64, 1)  # (128, 64, 1)
 
     @classmethod
     def name(cls):
@@ -104,13 +103,13 @@ class BaseModel(object):
 
         return (layer_output)
 
-    def keras_model(self, is_training):
+    def keras_model(self, input_shape, is_training):
 
         input_image = Input(
-            name='input_image', shape=self._input_shape,
+            name='input_image', shape=input_shape,
             dtype='float32')  # (None, 128, 64, 1)
 
-        self._feature_extractor.build(input_shape=self._input_shape)
+        self._feature_extractor.build(input_shape=input_shape)
         features = self._feature_extractor.extract_features(input_image)
 
         # CNN to RNN
