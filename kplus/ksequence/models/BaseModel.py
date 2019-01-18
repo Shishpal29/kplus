@@ -44,7 +44,7 @@ class BaseModel(object):
 
     def __init__(self):
         self._feature_extractor = None
-        self._input_shape = (img_w, img_h, 1)  # (128, 64, 1)
+        self._input_shape = (128, 64, 1)  # (128, 64, 1)
 
     @classmethod
     def name(cls):
@@ -52,7 +52,6 @@ class BaseModel(object):
 
     def use_feature_extractor(self, feature_extractor):
         self._feature_extractor = ModelFactory.simple_model(feature_extractor)
-        self._feature_extractor.build(input_shape=self._input_shape)
 
     def _loss_function(self, inputs):
         input_labels, predicted_output, input_length, label_length = inputs
@@ -111,6 +110,7 @@ class BaseModel(object):
             name='input_image', shape=self._input_shape,
             dtype='float32')  # (None, 128, 64, 1)
 
+        self._feature_extractor.build(input_shape=self._input_shape)
         features = self._feature_extractor.extract_features(input_image)
 
         # CNN to RNN
