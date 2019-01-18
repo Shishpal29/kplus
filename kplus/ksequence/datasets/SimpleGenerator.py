@@ -31,15 +31,15 @@ import numpy as np
 from kplus.ksequence.parameter import letters
 
 
-def labels_to_text(labels):  # letters index -> text (string)
-    return ''.join(list(map(lambda x: letters[int(x)], labels)))
-
-
-def text_to_labels(text):  # text letters
-    return list(map(lambda x: letters.index(x), text))
-
-
 class SimpleGenerator:
+    @classmethod
+    def labels_to_text(cls, labels):
+        return ''.join(list(map(lambda x: letters[int(x)], labels)))
+
+    @classmethod
+    def text_to_labels(cls, text):
+        return list(map(lambda x: letters.index(x), text))
+
     def __init__(self,
                  img_dirpath,
                  img_w,
@@ -95,7 +95,7 @@ class SimpleGenerator:
                 img = img.T
                 img = np.expand_dims(img, -1)
                 X_data[i] = img
-                Y_data[i] = text_to_labels(text)
+                Y_data[i] = SimpleGenerator.text_to_labels(text)
                 label_length[i] = len(text)
 
             inputs = {
