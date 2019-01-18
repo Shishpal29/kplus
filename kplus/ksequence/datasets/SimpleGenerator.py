@@ -28,13 +28,11 @@ import cv2
 import os, random
 import numpy as np
 
-#from kplus.ksequence.parameter import letters
-
 
 class SimpleGenerator:
 
-    __CHAR_VECTOR = "adefghjknqrstwABCDEFGHIJKLMNOPZ0123456789"
-    __letters = [letter for letter in __CHAR_VECTOR]
+    __all_letters = "adefghjknqrstwABCDEFGHIJKLMNOPZ0123456789"
+    __letters = [letter for letter in __all_letters]
 
     @classmethod
     def number_of_letters(cls):
