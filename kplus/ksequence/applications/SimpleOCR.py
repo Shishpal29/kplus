@@ -62,8 +62,9 @@ class SimpleOCR(AbstractApplication):
         self._downsample_factor = parameters['model']['downsample_factor']
 
         input_shape = (self._image_width, self._image_height, 1)
-        self._keras_model = sequence_model.keras_model(input_shape,
-                                                       is_training)
+        number_of_classes = SimpleGenerator.number_of_letters() + 1
+        self._keras_model = sequence_model.keras_model(
+            input_shape, number_of_classes, is_training)
 
         try:
             self._keras_model.load_weights(parameters['test']['model_name'])

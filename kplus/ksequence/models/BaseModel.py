@@ -31,7 +31,7 @@ from keras.layers.merge import add, concatenate
 from keras.models import Model
 from keras.layers.recurrent import LSTM
 
-from kplus.ksequence.parameter import *
+#from kplus.ksequence.parameter import *
 
 from kplus.kclassifier.models.ModelFactory import ModelFactory
 
@@ -107,7 +107,7 @@ class BaseModel(object):
 
         return (layer_output)
 
-    def keras_model(self, input_shape, is_training):
+    def keras_model(self, input_shape, number_of_classes, is_training):
 
         input_image = Input(
             name='input_image', shape=input_shape,
@@ -132,7 +132,7 @@ class BaseModel(object):
 
         # RNN to output prediction
         inner = Dense(
-            num_classes, kernel_initializer='he_normal',
+            number_of_classes, kernel_initializer='he_normal',
             name='dense2')(decoded_sequence)  #(None, 32, 63)
 
         predicted_output = Activation('softmax', name='softmax')(inner)

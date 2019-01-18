@@ -28,17 +28,26 @@ import cv2
 import os, random
 import numpy as np
 
-from kplus.ksequence.parameter import letters
+#from kplus.ksequence.parameter import letters
 
 
 class SimpleGenerator:
+
+    __CHAR_VECTOR = "adefghjknqrstwABCDEFGHIJKLMNOPZ0123456789"
+    __letters = [letter for letter in __CHAR_VECTOR]
+
+    @classmethod
+    def number_of_letters(cls):
+        return (len(SimpleGenerator.__letters))
+
     @classmethod
     def labels_to_text(cls, labels):
-        return ''.join(list(map(lambda x: letters[int(x)], labels)))
+        return ''.join(
+            list(map(lambda x: SimpleGenerator.__letters[int(x)], labels)))
 
     @classmethod
     def text_to_labels(cls, text):
-        return list(map(lambda x: letters.index(x), text))
+        return list(map(lambda x: SimpleGenerator.__letters.index(x), text))
 
     def __init__(self, img_dirpath, img_w, img_h, batch_size,
                  downsample_factor, max_text_len):
