@@ -40,13 +40,8 @@ class SimpleGenerator:
     def text_to_labels(cls, text):
         return list(map(lambda x: letters.index(x), text))
 
-    def __init__(self,
-                 img_dirpath,
-                 img_w,
-                 img_h,
-                 batch_size,
-                 downsample_factor,
-                 max_text_len=9):
+    def __init__(self, img_dirpath, img_w, img_h, batch_size,
+                 downsample_factor, max_text_len):
         self.img_h = img_h
         self.img_w = img_w
         self.batch_size = batch_size

@@ -30,4 +30,4 @@ letters = [letter for letter in CHAR_VECTOR]
 
 num_classes = len(letters) + 1
 
-max_text_len = 9
+#max_text_len = 9

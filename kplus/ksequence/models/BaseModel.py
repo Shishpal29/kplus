@@ -44,6 +44,7 @@ class BaseModel(object):
 
     def __init__(self):
         self._feature_extractor = None
+        self._maximum_text_length = 9
 
     @classmethod
     def name(cls):
@@ -51,6 +52,9 @@ class BaseModel(object):
 
     def use_feature_extractor(self, feature_extractor):
         self._feature_extractor = ModelFactory.simple_model(feature_extractor)
+
+    def maximum_text_length(self):
+        return (self._maximum_text_length)
 
     def _loss_function(self, inputs):
         input_labels, predicted_output, input_length, label_length = inputs
@@ -134,7 +138,8 @@ class BaseModel(object):
         predicted_output = Activation('softmax', name='softmax')(inner)
 
         input_labels = Input(
-            name='input_labels', shape=[max_text_len],
+            name='input_labels',
+            shape=[self._maximum_text_length],
             dtype='float32')  # (None ,9)
 
         input_length = Input(
