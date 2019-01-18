@@ -99,15 +99,15 @@ class AbstractApplication(object):
 
     def _change_learning_rate(self):
         self._change_learning_rate = ReduceLROnPlateau(
-            monitor='loss',
+            monitor='val_loss',
             factor=0.1,
-            patience=5,
+            patience=3,
             verbose=1,
             mode='auto',
             #epsilon=0.01,
             #min_delta=0.0,
-            cooldown=0,
-            min_lr=0)
+            cooldown=1,
+            min_lr=1e-7)
         return (True)
 
     def _setup_train_dataset(self, train_dataset_dir):
