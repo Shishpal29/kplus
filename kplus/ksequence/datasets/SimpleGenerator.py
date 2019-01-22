@@ -31,7 +31,7 @@ import numpy as np
 
 class SimpleGenerator:
 
-    __all_letters = "adefghjknqrstwABCDEFGHIJKLMNOPZ0123456789"
+    __all_letters = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
     __letters = [letter for letter in __all_letters]
 
     @classmethod
@@ -64,16 +64,20 @@ class SimpleGenerator:
 
     def build_data(self):
         print(self.n, " Image Loading start...")
-        for i, img_file in enumerate(self.img_dir):
+        index = 0
+        for img_file in self.img_dir:
             img = cv2.imread(self.img_dirpath + img_file, cv2.IMREAD_GRAYSCALE)
+            if (img is None):
+                continue
             img = cv2.resize(img, (self.img_w, self.img_h))
             img = img.astype(np.float32)
             img = (img / 255.0) * 2.0 - 1.0
 
-            self.imgs[i, :, :] = img
+            self.imgs[index, :, :] = img
             self.texts.append(img_file[0:-4])
+            index = index + 1
         print(len(self.texts) == self.n)
-        print(self.n, " Image Loading finish...")
+        print(self.n, index, " Image Loading finish...")
 
     def next_sample(self):
         self.cur_index += 1
@@ -85,9 +89,9 @@ class SimpleGenerator:
 
     def next_batch(self):
         while True:
-            X_data = np.ones([self.batch_size, self.img_w, self.img_h,
-                              1])  # (bs, 128, 64, 1)
-            Y_data = np.ones([self.batch_size, self.max_text_len])  # (bs, 9)
+            X_data = np.zeros([self.batch_size, self.img_w, self.img_h,
+                               1])  # (bs, 128, 64, 1)
+            Y_data = np.zeros([self.batch_size, self.max_text_len])  # (bs, 9)
             input_length = np.ones((self.batch_size, 1)) * (
                 self.img_w // self.downsample_factor - 2)  # (bs, 1)
             label_length = np.zeros((self.batch_size, 1))  # (bs, 1)
@@ -97,8 +101,9 @@ class SimpleGenerator:
                 img = img.T
                 img = np.expand_dims(img, -1)
                 X_data[i] = img
-                Y_data[i] = SimpleGenerator.text_to_labels(text)
-                label_length[i] = len(text)
+                chars = SimpleGenerator.text_to_labels(text)
+                length = label_length[i] = len(text)
+                Y_data[i][0:length] = chars[0:length]
 
             inputs = {
                 'input_image': X_data,  # (bs, 128, 64, 1)
