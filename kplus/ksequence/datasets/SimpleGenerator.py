@@ -31,7 +31,9 @@ import numpy as np
 
 class SimpleGenerator:
 
+    #__all_letters = "adefghjknqrstwABCDEFGHIJKLMNOPZ0123456789"
     __all_letters = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
     __letters = [letter for letter in __all_letters]
 
     @classmethod
