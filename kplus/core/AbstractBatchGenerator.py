@@ -25,6 +25,7 @@ from __future__ import division
 from __future__ import print_function
 
 import os
+import random
 import numpy as np
 import keras
 import cv2
@@ -46,7 +47,33 @@ class AbstractBatchGenerator(keras.utils.Sequence):
     """
 
     def __init__(self):
-        pass
+        self._labels_filename = 'labels.txt'
+        self._random_seed = 7
+
+    def labels_filename(self):
+        return (self._labels_filename)
+
+    def _generate_labels(self, source_root_dir, target_root_dir):
+
+        class_names = []
+        for class_name in os.listdir(source_root_dir):
+            class_path = os.path.join(source_root_dir, class_name)
+            if (os.path.isdir(class_path)):
+                class_names.append(class_name)
+
+        random.seed(self._random_seed)
+        random.shuffle(class_names)
+
+        labels_to_class_names = dict(zip(range(len(class_names)), class_names))
+        labels_file_path = os.path.join(target_root_dir,
+                                        self.labels_filename())
+
+        with open(labels_file_path, 'w') as file_stream:
+            for label in labels_to_class_names:
+                class_name = labels_to_class_names[label]
+                file_stream.write('%d:%s\n' % (label, class_name))
+
+        return (True)
 
     def generate_dataset(self, source_root_dir, target_root_dir):
 
@@ -57,7 +84,11 @@ class AbstractBatchGenerator(keras.utils.Sequence):
         if (not os.path.exists(target_root_dir)):
             os.makedirs(target_root_dir)
 
-        return (True)
+        status = True
+        status = self._generate_labels(source_root_dir,
+                                       target_root_dir) and status
+
+        return (status)
 
     def __len__(self):
         return int(np.floor(len(self.list_IDs) / self.batch_size))
