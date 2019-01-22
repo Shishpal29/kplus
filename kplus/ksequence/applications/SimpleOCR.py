@@ -43,6 +43,7 @@ class SimpleOCR(AbstractApplication):
         self._image_height = 64
         self._downsample_factor = 4
         self._maximum_text_length = 9
+        self._model_letters = None
 
     def _setup_model(self, parameters, is_training):
         model_name = parameters['model']['model_name']
@@ -56,13 +57,16 @@ class SimpleOCR(AbstractApplication):
         sequence_model = ModelFactory.simple_model(model_name)
         sequence_model.use_feature_extractor(feature_extractor)
 
+        model_letters = parameters['model']['letters']
+        self._model_letters = [letter for letter in model_letters]
+
         self._maximum_text_length = sequence_model.maximum_text_length()
         self._image_width = parameters['model']['image_width']
         self._image_height = parameters['model']['image_height']
         self._downsample_factor = parameters['model']['downsample_factor']
 
         input_shape = (self._image_width, self._image_height, 1)
-        number_of_classes = SimpleGenerator.number_of_letters() + 1
+        number_of_classes = len(self._model_letters) + 1
         self._keras_model = sequence_model.keras_model(
             input_shape, number_of_classes, is_training)
 
@@ -85,16 +89,16 @@ class SimpleOCR(AbstractApplication):
 
     def _setup_train_dataset(self, train_dataset_dir, train_batch_size):
         self._train_dataset_generator = SimpleGenerator(
-            train_dataset_dir, self._image_width, self._image_height,
-            train_batch_size, self._downsample_factor,
+            self._model_letters, train_dataset_dir, self._image_width,
+            self._image_height, train_batch_size, self._downsample_factor,
             self._maximum_text_length)
         self._train_dataset_generator.build_data()
         return (True)
 
     def _setup_test_dataset(self, test_dataset_dir, test_batch_size):
         self._test_dataset_generator = SimpleGenerator(
-            test_dataset_dir, self._image_width, self._image_height,
-            test_batch_size, self._downsample_factor,
+            self._model_letters, test_dataset_dir, self._image_width,
+            self._image_height, test_batch_size, self._downsample_factor,
             self._maximum_text_length)
         self._test_dataset_generator.build_data()
         return (True)

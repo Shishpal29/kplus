@@ -1,8 +1,8 @@
 {
     "model" : {
-		"letters" : "adefghjknqrstwABCDEFGHIJKLMNOPZ0123456789",
+		"letters" : " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
 
-		"model_name" : "base",
+		"model_name" : "bidirectional",
 		"feature_extractor" : "simple_vgg",
 
 		"image_width" : 128,

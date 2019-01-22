@@ -30,27 +30,15 @@ import numpy as np
 
 
 class SimpleGenerator:
+    def labels_to_text(self, labels):
+        return ''.join(list(map(lambda x: self._letters[int(x)], labels)))
 
-    #__all_letters = "adefghjknqrstwABCDEFGHIJKLMNOPZ0123456789"
-    __all_letters = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    def text_to_labels(self, text):
+        return list(map(lambda x: self._letters.index(x), text))
 
-    __letters = [letter for letter in __all_letters]
-
-    @classmethod
-    def number_of_letters(cls):
-        return (len(SimpleGenerator.__letters))
-
-    @classmethod
-    def labels_to_text(cls, labels):
-        return ''.join(
-            list(map(lambda x: SimpleGenerator.__letters[int(x)], labels)))
-
-    @classmethod
-    def text_to_labels(cls, text):
-        return list(map(lambda x: SimpleGenerator.__letters.index(x), text))
-
-    def __init__(self, img_dirpath, img_w, img_h, batch_size,
+    def __init__(self, letters, img_dirpath, img_w, img_h, batch_size,
                  downsample_factor, max_text_len):
+        self._letters = letters
         self.img_h = img_h
         self.img_w = img_w
         self.batch_size = batch_size
@@ -103,7 +91,7 @@ class SimpleGenerator:
                 img = img.T
                 img = np.expand_dims(img, -1)
                 X_data[i] = img
-                chars = SimpleGenerator.text_to_labels(text)
+                chars = self.text_to_labels(text)
                 length = label_length[i] = len(text)
                 Y_data[i][0:length] = chars[0:length]
 
