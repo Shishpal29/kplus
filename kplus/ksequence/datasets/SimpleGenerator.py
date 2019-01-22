@@ -30,12 +30,6 @@ import numpy as np
 
 
 class SimpleGenerator:
-    def labels_to_text(self, labels):
-        return ''.join(list(map(lambda x: self._letters[int(x)], labels)))
-
-    def text_to_labels(self, text):
-        return list(map(lambda x: self._letters.index(x), text))
-
     def __init__(self, letters, img_dirpath, img_w, img_h, batch_size,
                  downsample_factor, max_text_len):
         self._letters = letters
@@ -51,6 +45,12 @@ class SimpleGenerator:
         self.cur_index = 0
         self.imgs = np.zeros((self.n, self.img_h, self.img_w))
         self.texts = []
+
+    def labels_to_text(self, labels):
+        return ''.join(list(map(lambda x: self._letters[int(x)], labels)))
+
+    def text_to_labels(self, text):
+        return list(map(lambda x: self._letters.index(x), text))
 
     def build_data(self):
         print(self.n, " Image Loading start...")
