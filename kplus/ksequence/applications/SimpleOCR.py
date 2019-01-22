@@ -60,7 +60,7 @@ class SimpleOCR(AbstractApplication):
         model_letters = parameters['model']['letters']
         self._model_letters = [letter for letter in model_letters]
 
-        self._maximum_text_length = sequence_model.maximum_text_length()
+        self._maximum_text_length = parameters['model']['maximum_text_length']
         self._image_width = parameters['model']['image_width']
         self._image_height = parameters['model']['image_height']
         self._downsample_factor = parameters['model']['downsample_factor']
@@ -68,7 +68,8 @@ class SimpleOCR(AbstractApplication):
         input_shape = (self._image_width, self._image_height, 1)
         number_of_classes = len(self._model_letters) + 1
         self._keras_model = sequence_model.keras_model(
-            input_shape, number_of_classes, is_training)
+            input_shape, number_of_classes, self._maximum_text_length,
+            is_training)
 
         try:
             self._keras_model.load_weights(parameters['test']['model_name'])

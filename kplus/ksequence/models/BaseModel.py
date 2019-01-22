@@ -107,7 +107,10 @@ class BaseModel(object):
 
         return (layer_output)
 
-    def keras_model(self, input_shape, number_of_classes, is_training):
+    def keras_model(self, input_shape, number_of_classes, maximum_text_length,
+                    is_training):
+
+        self._maximum_text_length = maximum_text_length
 
         input_image = Input(
             name='input_image', shape=input_shape,
