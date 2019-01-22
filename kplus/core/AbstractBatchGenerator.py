@@ -24,6 +24,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import os
 import numpy as np
 import keras
 import cv2
@@ -48,6 +49,14 @@ class AbstractBatchGenerator(keras.utils.Sequence):
         pass
 
     def generate_dataset(self, source_root_dir, target_root_dir):
+
+        if (not os.path.exists(source_root_dir)):
+            return (False)
+
+        target_root_dir = os.path.expanduser(target_root_dir)
+        if (not os.path.exists(target_root_dir)):
+            os.makedirs(target_root_dir)
+
         return (True)
 
     def __len__(self):

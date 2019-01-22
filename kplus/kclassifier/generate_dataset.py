@@ -52,11 +52,11 @@ def main(args):
 
     if (not args.source_root_dir):
         raise ValueError(
-            'You must supply input source directory with --source_root_dir.')
+            'You must supply source root directory with --source_root_dir.')
 
     if (not args.target_root_dir):
         raise ValueError(
-            'You must supply output directory with --target_root_dir.')
+            'You must supply target root directory with --target_root_dir.')
 
     batch_generator = AbstractBatchGenerator()
     status = batch_generator.generate_dataset(args.source_root_dir,
