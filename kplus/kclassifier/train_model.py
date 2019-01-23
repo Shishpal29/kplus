@@ -50,7 +50,7 @@ def main(args):
         parameters = json.loads(input_buffer.read())
 
     batch_generator = AbstractBatchGenerator()
-    status = batch_generator.load(parameters)
+    status = batch_generator.load('train', parameters)
     if (status):
         print('The model is trained.')
     else:

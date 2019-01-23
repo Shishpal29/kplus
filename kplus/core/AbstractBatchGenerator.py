@@ -50,6 +50,11 @@ class AbstractBatchGenerator(keras.utils.Sequence):
         self._labels_filename = 'labels.txt'
         self._labels_to_class_names = None
         self._class_names_labels_to = None
+
+        self._image_width = 0
+        self._image_height = 0
+        self._number_of_channels = 0
+
         self._random_seed = 7
 
     def labels_filename(self):
@@ -124,10 +129,16 @@ class AbstractBatchGenerator(keras.utils.Sequence):
 
         return (True)
 
-    def load(self, parameters):
-        train_dataset_dir = parameters['train']['dataset_dir']
+    def load(self, split_name, parameters):
+        train_dataset_dir = parameters[split_name]['dataset_dir']
         if (not self._read_labels(train_dataset_dir)):
             return (False)
+
+        self._image_width = parameters['model']['image_width']
+        self._image_height = parameters['model']['image_height']
+        self._number_of_channels = parameters['model']['number_of_channels']
+
+        self._batch_size = parameters[split_name]['batch_size']
 
         return (True)
 
