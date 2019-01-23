@@ -120,12 +120,13 @@ class AbstractBatchGenerator(keras.utils.Sequence):
             self._class_names_to_labels[str(line[index + 1:])] = int(
                 line[:index])
 
-        #print(self._labels_to_class_names, self._class_names_to_labels)
+        print(self._labels_to_class_names, self._class_names_to_labels)
 
         return (True)
 
-    def load(self, source_root_dir):
-        if (not self._read_labels(source_root_dir)):
+    def load(self, parameters):
+        train_dataset_dir = parameters['train']['dataset_dir']
+        if (not self._read_labels(train_dataset_dir)):
             return (False)
 
         return (True)

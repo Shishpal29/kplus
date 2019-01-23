@@ -1,0 +1,21 @@
+{
+    "model" : {
+		"image_width" : 128,
+		"image_height" : 64,
+		"number_of_channels" : 3
+    },
+
+    "train" : {	    
+		"train_root_dir" : "./train",
+		"max_number_of_epoch" : 30,
+		"dataset_dir" : "./source/",
+		"batch_size" : 128,
+		"model_name" : "model--{epoch:03d}--{val_loss:0.5f}.hdf5"
+    },
+
+    "test" : {	    
+		"dataset_dir" : "./datasets/test/",
+		"batch_size" : 16,
+		"model_name" : "model--030.hdf5"    
+    }
+}

@@ -26,6 +26,7 @@ from __future__ import print_function
 
 import sys
 import argparse
+import json
 
 from kplus.core.AbstractBatchGenerator import AbstractBatchGenerator
 
@@ -34,22 +35,22 @@ def parse_arguments(argv):
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        '--source_root_dir',
+        '--parameter_filename',
         type=str,
-        help='Input source directory.',
-        default='./source')
+        help='Input parameter file name.',
+        default='./parameters/parameters.json')
 
     return (parser.parse_args(argv))
 
 
 def main(args):
+    parameter_filename = args.parameter_filename
 
-    if (not args.source_root_dir):
-        raise ValueError(
-            'You must supply source root directory with --source_root_dir.')
+    with open(parameter_filename) as input_buffer:
+        parameters = json.loads(input_buffer.read())
 
     batch_generator = AbstractBatchGenerator()
-    status = batch_generator.load(args.source_root_dir)
+    status = batch_generator.load(parameters)
     if (status):
         print('The model is trained.')
     else:
