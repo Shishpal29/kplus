@@ -48,6 +48,8 @@ class AbstractBatchGenerator(keras.utils.Sequence):
 
     def __init__(self):
         self._labels_filename = 'labels.txt'
+        self._labels_to_class_names = None
+        self._class_names_labels_to = None
         self._random_seed = 7
 
     def labels_filename(self):
@@ -89,6 +91,44 @@ class AbstractBatchGenerator(keras.utils.Sequence):
                                        target_root_dir) and status
 
         return (status)
+
+    def _has_labels(self, source_root_dir):
+        labels_file_path = os.path.join(source_root_dir,
+                                        self.labels_filename())
+        status = os.path.exists(labels_file_path) and os.path.isfile(
+            labels_file_path)
+        return (status)
+
+    def _read_labels(self, source_root_dir):
+
+        if (not self._has_labels(source_root_dir)):
+            return (False)
+
+        labels_file_path = os.path.join(source_root_dir,
+                                        self.labels_filename())
+
+        with open(labels_file_path, 'r') as labels_file:
+            lines = labels_file.readlines()
+
+        self._labels_to_class_names = {}
+        self._class_names_to_labels = {}
+        for line in lines:
+            line = line.strip('\n')
+            index = line.index(':')
+            self._labels_to_class_names[int(line[:index])] = str(
+                line[index + 1:])
+            self._class_names_to_labels[str(line[index + 1:])] = int(
+                line[:index])
+
+        #print(self._labels_to_class_names, self._class_names_to_labels)
+
+        return (True)
+
+    def load(self, source_root_dir):
+        if (not self._read_labels(source_root_dir)):
+            return (False)
+
+        return (True)
 
     def __len__(self):
         return int(np.floor(len(self.list_IDs) / self.batch_size))

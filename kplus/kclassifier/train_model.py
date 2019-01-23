@@ -23,3 +23,38 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+
+import sys
+import argparse
+
+from kplus.core.AbstractBatchGenerator import AbstractBatchGenerator
+
+
+def parse_arguments(argv):
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        '--source_root_dir',
+        type=str,
+        help='Input source directory.',
+        default='./source')
+
+    return (parser.parse_args(argv))
+
+
+def main(args):
+
+    if (not args.source_root_dir):
+        raise ValueError(
+            'You must supply source root directory with --source_root_dir.')
+
+    batch_generator = AbstractBatchGenerator()
+    status = batch_generator.load(args.source_root_dir)
+    if (status):
+        print('The model is trained.')
+    else:
+        print('Error training the model.')
+
+
+if __name__ == '__main__':
+    main(parse_arguments(sys.argv[1:]))
