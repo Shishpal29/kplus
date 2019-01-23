@@ -55,6 +55,8 @@ class AbstractBatchGenerator(keras.utils.Sequence):
         self._image_height = 0
         self._number_of_channels = 0
 
+        self._batch_size = 0
+
         self._random_seed = 7
 
     def labels_filename(self):
