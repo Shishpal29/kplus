@@ -42,6 +42,8 @@ class AbstractBatchGenerator(keras.utils.Sequence):
         self.on_epoch_end()
     """
 
+    _minimum_images = 1
+
     @classmethod
     def train_split_name(cls):
         return ('train')
@@ -59,7 +61,7 @@ class AbstractBatchGenerator(keras.utils.Sequence):
 
         self._labels_to_class_names = None
         self._class_names_to_labels = None
-        self._dataset = None
+        self._dataset = []
         self._number_of_classes = 0
 
         self._patterns = ["*.jpg", "*.jpeg", "*.png", "*.bmp"]
@@ -154,11 +156,37 @@ class AbstractBatchGenerator(keras.utils.Sequence):
                 or (not os.path.isdir(dataset_dir))):
             return (False)
 
+        self._dataset = []
+
         class_names = [
             class_name for class_name in os.listdir(dataset_dir)
             if os.path.isdir(os.path.join(dataset_dir, class_name))
         ]
 
+        for class_name in class_names:
+            class_source_dir = os.path.join(dataset_dir, class_name)
+
+            if ((not os.path.isdir(class_source_dir))
+                    or (class_name not in self._class_names_to_labels)):
+                continue
+
+            number_of_images = 0
+            class_images = []
+            for pattern in self._patterns:
+                images = fnmatch.filter(os.listdir(class_source_dir), pattern)
+                current_images = len(images)
+                if (current_images > 0):
+                    class_images = class_images + images
+                number_of_images = number_of_images + current_images
+
+            if (number_of_images >= AbstractBatchGenerator._minimum_images):
+                for image in class_images:
+                    source_file_name = os.path.join(class_source_dir, image)
+                    class_label = self._class_names_to_labels[class_name]
+                    current_data = [source_file_name, class_label]
+                    #print(source_file_name, class_label)
+                    self._dataset.append(current_data)
+        #print(self._dataset)
         return (True)
 
     def _load_split(self, split_name, parameters):
