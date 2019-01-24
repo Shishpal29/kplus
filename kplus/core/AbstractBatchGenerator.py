@@ -46,16 +46,31 @@ class AbstractBatchGenerator(keras.utils.Sequence):
         self.on_epoch_end()
     """
 
+    @classmethod
+    def train_split_name(cls):
+        return ('train')
+
+    @classmethod
+    def val_split_name(cls):
+        return ('val')
+
+    @classmethod
+    def test_split_name(cls):
+        return ('test')
+
     def __init__(self):
         self._labels_filename = 'labels.txt'
+
         self._labels_to_class_names = None
-        self._class_names_labels_to = None
+        self._class_names_to_labels = None
+        self._number_of_classes = 0
 
         self._image_width = 0
         self._image_height = 0
         self._number_of_channels = 0
 
         self._batch_size = 0
+        self._shuffle = True
 
         self._random_seed = 7
 
@@ -131,9 +146,9 @@ class AbstractBatchGenerator(keras.utils.Sequence):
 
         return (True)
 
-    def load(self, split_name, parameters):
-        train_dataset_dir = parameters[split_name]['dataset_dir']
-        if (not self._read_labels(train_dataset_dir)):
+    def _load_split(self, split_name, parameters):
+        dataset_dir = parameters[split_name]['dataset_dir']
+        if (not self._read_labels(dataset_dir)):
             return (False)
 
         self._image_width = parameters['model']['image_width']
@@ -143,6 +158,18 @@ class AbstractBatchGenerator(keras.utils.Sequence):
         self._batch_size = parameters[split_name]['batch_size']
 
         return (True)
+
+    def load_train_dataset(self, parameters):
+        split_name = AbstractBatchGenerator.train_split_name()
+        return (self._load_split(split_name, parameters))
+
+    def load_val_dataset(self, parameters):
+        split_name = AbstractBatchGenerator.val_split_name()
+        return (self._load_split(split_name, parameters))
+
+    def load_test_dataset(self, parameters):
+        split_name = AbstractBatchGenerator.test_split_name()
+        return (self._load_split(split_name, parameters))
 
     def __len__(self):
         return int(np.floor(len(self.list_IDs) / self.batch_size))

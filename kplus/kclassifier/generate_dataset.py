@@ -37,13 +37,13 @@ def parse_arguments(argv):
         '--source_root_dir',
         type=str,
         help='Input source directory.',
-        default='./source')
+        default='/datasets/flowers/train/')
 
     parser.add_argument(
         '--target_root_dir',
         type=str,
         help='Output directory.',
-        default='./target')
+        default='/datasets/flowers/train/')
 
     return (parser.parse_args(argv))
 

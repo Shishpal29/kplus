@@ -8,13 +8,19 @@
     "train" : {	    
 		"train_root_dir" : "./train",
 		"max_number_of_epoch" : 30,
-		"dataset_dir" : "./source/",
+		"dataset_dir" : "/datasets/flowers/train/",
 		"batch_size" : 128,
 		"model_name" : "model--{epoch:03d}--{val_loss:0.5f}.hdf5"
     },
 
+    "val" : {	    
+		"dataset_dir" : "/datasets/flowers/val/",
+		"batch_size" : 16,
+		"model_name" : "model--030.hdf5"    
+    },
+
     "test" : {	    
-		"dataset_dir" : "./datasets/test/",
+		"dataset_dir" : "/datasets/flowers/test/",
 		"batch_size" : 16,
 		"model_name" : "model--030.hdf5"    
     }
