@@ -62,6 +62,7 @@ class AbstractBatchGenerator(keras.utils.Sequence):
         self._labels_to_class_names = None
         self._class_names_to_labels = None
         self._dataset = []
+        self._identifiers = []
         self._number_of_classes = 0
 
         self._patterns = ["*.jpg", "*.jpeg", "*.png", "*.bmp"]
@@ -146,10 +147,14 @@ class AbstractBatchGenerator(keras.utils.Sequence):
                 line[:index])
 
         self._number_of_classes = len(self._class_names_to_labels)
-        print(self._number_of_classes, self._labels_to_class_names,
-              self._class_names_to_labels)
+        #print(self._number_of_classes, self._labels_to_class_names, self._class_names_to_labels)
 
         return (True)
+
+    def on_epoch_end(self):
+        if (self._shuffle == True):
+            np.random.shuffle(self._identifiers)
+        #print(self._identifiers)
 
     def _load_dataset(self, dataset_dir):
         if ((not os.path.exists(dataset_dir))
@@ -157,12 +162,13 @@ class AbstractBatchGenerator(keras.utils.Sequence):
             return (False)
 
         self._dataset = []
-
+        self._identifiers = []
         class_names = [
             class_name for class_name in os.listdir(dataset_dir)
             if os.path.isdir(os.path.join(dataset_dir, class_name))
         ]
 
+        number_of_samples = 0
         for class_name in class_names:
             class_source_dir = os.path.join(dataset_dir, class_name)
 
@@ -183,10 +189,20 @@ class AbstractBatchGenerator(keras.utils.Sequence):
                 for image in class_images:
                     source_file_name = os.path.join(class_source_dir, image)
                     class_label = self._class_names_to_labels[class_name]
-                    current_data = [source_file_name, class_label]
+                    current_data = {
+                        'filename': source_file_name,
+                        'label': class_label
+                    }
                     #print(source_file_name, class_label)
                     self._dataset.append(current_data)
+                    number_of_samples = number_of_samples + 1
+                    self._identifiers.append(number_of_samples)
+
         #print(self._dataset)
+        #print(self._identifiers)
+
+        self.on_epoch_end()
+
         return (True)
 
     def _load_split(self, split_name, parameters):
@@ -237,11 +253,6 @@ class AbstractBatchGenerator(keras.utils.Sequence):
         X, y = self.__data_generation(list_IDs_temp)
 
         return X, y
-
-    def on_epoch_end(self):
-        self.indexes = np.arange(len(self.list_IDs))
-        if (self._shuffle == True):
-            np.random.shuffle(self.indexes)
 
     def __data_generation(self, list_IDs_temp):
         # X : (n_samples, *dim, n_channels)
