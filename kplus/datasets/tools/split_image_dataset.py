@@ -53,13 +53,10 @@ def build(source_dir, target_dir, test_ratio, val_ratio):
 
     filenames = os.listdir(source_dir)
 
-    filenames.sort(
-    )  # make sure that the filenames have a fixed order before shuffling
+    filenames.sort()
 
     random.seed(230)
-    random.shuffle(
-        filenames
-    )  # shuffles the ordering of filenames (deterministic given the chosen seed)
+    random.shuffle(filenames)
 
     split_1 = int((train_ratio / 100) * len(filenames))
     split_2 = int(((train_ratio + val_ratio) / 100) * len(filenames))
