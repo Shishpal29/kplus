@@ -55,10 +55,12 @@ def main(args):
     status = train_dataset.load_train_dataset(parameters) and status
 
     val_dataset = AbstractBatchGenerator()
-    status = train_dataset.load_val_dataset(parameters) and status
+    status = val_dataset.load_val_dataset(parameters) and status
 
     test_dataset = AbstractBatchGenerator()
-    status = train_dataset.load_test_dataset(parameters) and status
+    status = test_dataset.load_test_dataset(parameters) and status
+    X, y = test_dataset[1]
+    print(y)
 
     if (status):
         print('The model is trained.')

@@ -33,14 +33,6 @@ import cv2
 
 
 class AbstractBatchGenerator(keras.utils.Sequence):
-    """
-    def __init__(self, list_IDs, labels, batch_size=32, dim=(32,32,32), n_channels=1,
-                 n_classes=10, shuffle=True):
-
-        self.labels = labels
-        self.list_IDs = list_IDs
-        self.on_epoch_end()
-    """
 
     _minimum_images = 1
 
@@ -55,6 +47,14 @@ class AbstractBatchGenerator(keras.utils.Sequence):
     @classmethod
     def test_split_name(cls):
         return ('test')
+
+    @classmethod
+    def filename_tag(cls):
+        return ('filename')
+
+    @classmethod
+    def label_tag(cls):
+        return ('label')
 
     def __init__(self):
         self._labels_filename = 'labels.txt'
@@ -190,8 +190,9 @@ class AbstractBatchGenerator(keras.utils.Sequence):
                     source_file_name = os.path.join(class_source_dir, image)
                     class_label = self._class_names_to_labels[class_name]
                     current_data = {
-                        'filename': source_file_name,
-                        'label': class_label
+                        AbstractBatchGenerator.filename_tag():
+                        source_file_name,
+                        AbstractBatchGenerator.label_tag(): class_label
                     }
                     #print(source_file_name, class_label)
                     self._dataset.append(current_data)
@@ -236,6 +237,7 @@ class AbstractBatchGenerator(keras.utils.Sequence):
         return (int(np.ceil(self.number_of_samples() / self._batch_size)))
 
     def __getitem__(self, index):
+
         lower_bound = index * self._batch_size
         upper_bound = (index + 1) * self._batch_size
 
@@ -243,29 +245,30 @@ class AbstractBatchGenerator(keras.utils.Sequence):
             upper_bound = self.number_of_samples()
             lower_bound = upper_bound - self._batch_size
 
-        for train_instance in self.images[l_bound:r_bound]:
-            pass
+        #print(lower_bound,upper_bound, self._batch_size)
 
-        # Find list of IDs
-        list_IDs_temp = [self.list_IDs[k] for k in indexes]
+        X = np.empty((self._batch_size, self._image_height, self._image_width,
+                      self._number_of_channels))
+        y = np.empty((self._batch_size), dtype=int)
 
-        # Generate data
-        X, y = self.__data_generation(list_IDs_temp)
+        for index in range(lower_bound, upper_bound):
+            target_index = index - lower_bound
+            source_identifier = self._identifiers[index]
+            print(index, target_index, source_identifier,
+                  self._dataset[source_identifier][AbstractBatchGenerator.
+                                                   filename_tag()],
+                  self._dataset[source_identifier][AbstractBatchGenerator.
+                                                   label_tag()])
+            input_image = cv2.imread(
+                self._dataset[source_identifier][
+                    AbstractBatchGenerator.filename_tag()], cv2.IMREAD_COLOR)
+            input_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2RGB)
+            input_image = cv2.resize(input_image,
+                                     (self._image_width, self._image_height))
+            #input_image = np.asarray(input_image, dtype='float32')
+
+            X[target_index] = input_image
+            y[target_index] = self._dataset[source_identifier][
+                AbstractBatchGenerator.label_tag()]
 
         return X, y
-
-    def __data_generation(self, list_IDs_temp):
-        # X : (n_samples, *dim, n_channels)
-        # Initialization
-        X = np.empty((self.batch_size, *self.dim, self.n_channels))
-        y = np.empty((self.batch_size), dtype=int)
-
-        # Generate data
-        for i, ID in enumerate(list_IDs_temp):
-            # Store sample
-            X[i, ] = np.load('data/' + ID + '.npy')
-
-            # Store class
-            y[i] = self.labels[ID]
-
-        return X, keras.utils.to_categorical(y, num_classes=self.n_classes)
