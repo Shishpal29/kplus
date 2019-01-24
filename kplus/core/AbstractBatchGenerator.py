@@ -26,6 +26,7 @@ from __future__ import print_function
 
 import os
 import random
+import fnmatch
 import numpy as np
 import keras
 import cv2
@@ -36,13 +37,8 @@ class AbstractBatchGenerator(keras.utils.Sequence):
     def __init__(self, list_IDs, labels, batch_size=32, dim=(32,32,32), n_channels=1,
                  n_classes=10, shuffle=True):
 
-        self.dim = dim
-        self.batch_size = batch_size
         self.labels = labels
         self.list_IDs = list_IDs
-        self.n_channels = n_channels
-        self.n_classes = n_classes
-        self.shuffle = shuffle
         self.on_epoch_end()
     """
 
@@ -63,8 +59,10 @@ class AbstractBatchGenerator(keras.utils.Sequence):
 
         self._labels_to_class_names = None
         self._class_names_to_labels = None
+        self._dataset = None
         self._number_of_classes = 0
 
+        self._patterns = ["*.jpg", "*.jpeg", "*.png", "*.bmp"]
         self._image_width = 0
         self._image_height = 0
         self._number_of_channels = 0
@@ -76,6 +74,9 @@ class AbstractBatchGenerator(keras.utils.Sequence):
 
     def labels_filename(self):
         return (self._labels_filename)
+
+    def number_of_samples(self):
+        return (len(self._dataset))
 
     def _generate_labels(self, source_root_dir, target_root_dir):
 
@@ -142,13 +143,29 @@ class AbstractBatchGenerator(keras.utils.Sequence):
             self._class_names_to_labels[str(line[index + 1:])] = int(
                 line[:index])
 
-        print(self._labels_to_class_names, self._class_names_to_labels)
+        self._number_of_classes = len(self._class_names_to_labels)
+        print(self._number_of_classes, self._labels_to_class_names,
+              self._class_names_to_labels)
+
+        return (True)
+
+    def _load_dataset(self, dataset_dir):
+        if ((not os.path.exists(dataset_dir))
+                or (not os.path.isdir(dataset_dir))):
+            return (False)
+
+        class_names = [
+            class_name for class_name in os.listdir(dataset_dir)
+            if os.path.isdir(os.path.join(dataset_dir, class_name))
+        ]
 
         return (True)
 
     def _load_split(self, split_name, parameters):
         dataset_dir = parameters[split_name]['dataset_dir']
-        if (not self._read_labels(dataset_dir)):
+        train_dataset_dir = parameters[AbstractBatchGenerator.
+                                       train_split_name()]['dataset_dir']
+        if (not self._read_labels(train_dataset_dir)):
             return (False)
 
         self._image_width = parameters['model']['image_width']
@@ -157,7 +174,7 @@ class AbstractBatchGenerator(keras.utils.Sequence):
 
         self._batch_size = parameters[split_name]['batch_size']
 
-        return (True)
+        return (self._load_dataset(dataset_dir))
 
     def load_train_dataset(self, parameters):
         split_name = AbstractBatchGenerator.train_split_name()
@@ -172,12 +189,18 @@ class AbstractBatchGenerator(keras.utils.Sequence):
         return (self._load_split(split_name, parameters))
 
     def __len__(self):
-        return int(np.floor(len(self.list_IDs) / self.batch_size))
+        return (int(np.ceil(self.number_of_samples() / self._batch_size)))
 
     def __getitem__(self, index):
-        # Generate indexes of the batch
-        indexes = self.indexes[index * self.batch_size:(index + 1) *
-                               self.batch_size]
+        lower_bound = index * self._batch_size
+        upper_bound = (index + 1) * self._batch_size
+
+        if (upper_bound > self.number_of_samples()):
+            upper_bound = self.number_of_samples()
+            lower_bound = upper_bound - self._batch_size
+
+        for train_instance in self.images[l_bound:r_bound]:
+            pass
 
         # Find list of IDs
         list_IDs_temp = [self.list_IDs[k] for k in indexes]
@@ -189,7 +212,7 @@ class AbstractBatchGenerator(keras.utils.Sequence):
 
     def on_epoch_end(self):
         self.indexes = np.arange(len(self.list_IDs))
-        if self.shuffle == True:
+        if (self._shuffle == True):
             np.random.shuffle(self.indexes)
 
     def __data_generation(self, list_IDs_temp):

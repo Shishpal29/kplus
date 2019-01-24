@@ -49,8 +49,17 @@ def main(args):
     with open(parameter_filename) as input_buffer:
         parameters = json.loads(input_buffer.read())
 
+    status = True
+
     train_dataset = AbstractBatchGenerator()
-    status = train_dataset.load_train_dataset(parameters)
+    status = train_dataset.load_train_dataset(parameters) and status
+
+    val_dataset = AbstractBatchGenerator()
+    status = train_dataset.load_val_dataset(parameters) and status
+
+    test_dataset = AbstractBatchGenerator()
+    status = train_dataset.load_test_dataset(parameters) and status
+
     if (status):
         print('The model is trained.')
     else:
