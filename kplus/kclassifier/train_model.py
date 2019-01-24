@@ -30,6 +30,12 @@ import json
 
 from kplus.core.AbstractBatchGenerator import AbstractBatchGenerator
 
+from keras.layers import Input
+from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard, ReduceLROnPlateau
+from keras.layers.core import Dense, Dropout, Flatten
+from keras.models import Model
+from keras.applications.resnet50 import ResNet50
+
 
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
@@ -59,8 +65,35 @@ def main(args):
 
     test_dataset = AbstractBatchGenerator()
     status = test_dataset.load_test_dataset(parameters) and status
-    X, y = test_dataset[1]
-    print(y)
+    #X, y = test_dataset[1]
+    #print(y)
+
+    input_layer = Input(shape=(224, 224, 3))
+    base_model = ResNet50(
+        weights=None, include_top=False, input_tensor=input_layer)
+
+    x = base_model.output
+    x = Flatten()(x)
+    x = Dense(1024, activation='relu')(x)
+    x = Dropout(0.5)(x)
+    predictions = Dense(5, activation='softmax')(x)
+
+    model = Model(input=base_model.input, output=predictions)
+    model.compile(
+        optimizer='adam',
+        loss='categorical_crossentropy',
+        metrics=['categorical_accuracy'])
+
+    checkpoint = ModelCheckpoint(
+        filepath='./train/', monitor='loss', verbose=1, mode='auto', period=1)
+
+    model.fit_generator(
+        generator=train_dataset,
+        steps_per_epoch=train_dataset.steps_per_epoch(),
+        callbacks=[checkpoint],
+        epochs=5,
+        validation_data=val_dataset,
+        validation_steps=val_dataset.steps_per_epoch())
 
     if (status):
         print('The model is trained.')

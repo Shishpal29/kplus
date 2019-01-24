@@ -81,6 +81,9 @@ class AbstractBatchGenerator(keras.utils.Sequence):
     def number_of_samples(self):
         return (len(self._dataset))
 
+    def steps_per_epoch(self):
+        return (int(self.number_of_samples() / self._batch_size))
+
     def _generate_labels(self, source_root_dir, target_root_dir):
 
         class_names = []
@@ -236,10 +239,10 @@ class AbstractBatchGenerator(keras.utils.Sequence):
     def __len__(self):
         return (int(np.ceil(self.number_of_samples() / self._batch_size)))
 
-    def __getitem__(self, index):
+    def __getitem__(self, batch_index):
 
-        lower_bound = index * self._batch_size
-        upper_bound = (index + 1) * self._batch_size
+        lower_bound = batch_index * self._batch_size
+        upper_bound = (batch_index + 1) * self._batch_size
 
         if (upper_bound > self.number_of_samples()):
             upper_bound = self.number_of_samples()
@@ -271,4 +274,4 @@ class AbstractBatchGenerator(keras.utils.Sequence):
             y[target_index] = self._dataset[source_identifier][
                 AbstractBatchGenerator.label_tag()]
 
-        return X, y
+        return X, keras.utils.np_utils.to_categorical(y)
