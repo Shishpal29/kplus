@@ -58,9 +58,6 @@ class SimpleOCR(AbstractApplication):
         sequence_model = ModelFactory.simple_model(model_name)
         sequence_model.use_feature_extractor(feature_extractor)
 
-        model_letters = parameters['model']['letters']
-        self._model_letters = [letter for letter in model_letters]
-
         self._maximum_text_length = parameters['model']['maximum_text_length']
         self._image_width = parameters['model']['image_width']
         self._image_height = parameters['model']['image_height']
@@ -97,22 +94,32 @@ class SimpleOCR(AbstractApplication):
         dataset.build_data()
         return (dataset)
 
-    def _setup_train_dataset(self, train_dataset_dir, train_batch_size):
+    def _setup_train_dataset(self, parameters):
         dataset_dir = parameters['train']['dataset_dir']
         batch_size = parameters['train']['batch_size']
         self._train_dataset = self._setup_dataset(dataset_dir, batch_size)
         return (True)
 
-    def _setup_val_dataset(self, val_dataset_dir, val_batch_size):
+    def _setup_val_dataset(self, parameters):
         dataset_dir = parameters['val']['dataset_dir']
         batch_size = parameters['val']['batch_size']
         self._val_dataset = self._setup_dataset(dataset_dir, batch_size)
         return (True)
 
-    def _setup_test_dataset(self, test_dataset_dir, test_batch_size):
+    def _setup_test_dataset(self, parameters):
         dataset_dir = parameters['test']['dataset_dir']
         batch_size = parameters['test']['batch_size']
         self._test_dataset = self._setup_dataset(dataset_dir, batch_size)
+        return (True)
+
+    def _setup_datasets(self, parameters):
+        model_letters = parameters['model']['letters']
+        self._model_letters = [letter for letter in model_letters]
+
+        self._setup_train_dataset(parameters)
+        self._setup_val_dataset(parameters)
+        self._setup_test_dataset(parameters)
+
         return (True)
 
     def _train_model(self, parameters):
@@ -121,14 +128,14 @@ class SimpleOCR(AbstractApplication):
         test_batch_size = parameters['val']['batch_size']
         self._keras_model.fit_generator(
             generator=self._train_dataset.next_batch(),
-            steps_per_epoch=int(self._train_dataset.n / train_batch_size),
+            steps_per_epoch=self._train_dataset.steps_per_epoch(),
             callbacks=[
                 self._checkpoint, self._early_stop, self._change_learning_rate,
                 self._tensorboard
             ],
             epochs=epoch,
             validation_data=self._test_dataset.next_batch(),
-            validation_steps=int(self._test_dataset.n / test_batch_size))
+            validation_steps=self._test_dataset.steps_per_epoch())
 
         return (True)
 
