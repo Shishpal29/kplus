@@ -36,15 +36,6 @@ class SimpleClassifier(AbstractClassifier):
     def _setup_model(self, parameters, is_training):
         raise NotImplementedError('Must be implemented by the subclass.')
 
-    def _setup_train_dataset(self, train_dataset_dir, train_batch_size):
-        raise NotImplementedError('Must be implemented by the subclass.')
-
-    def _setup_val_dataset(self, val_dataset_dir, val_batch_size):
-        raise NotImplementedError('Must be implemented by the subclass.')
-
-    def _setup_test_dataset(self, test_dataset_dir, test_batch_size):
-        raise NotImplementedError('Must be implemented by the subclass.')
-
     def _train_model(self, parameters):
         raise NotImplementedError('Must be implemented by the subclass.')
 

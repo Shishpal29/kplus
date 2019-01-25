@@ -25,8 +25,30 @@ from __future__ import division
 from __future__ import print_function
 
 from kplus.core.AbstractApplication import AbstractApplication
+from kplus.kclassifier.datasets.ClassifierBatchGenerator import ClassifierBatchGenerator
 
 
 class AbstractClassifier(AbstractApplication):
     def __init__(self):
         AbstractApplication.__init__(self)
+
+    def _setup_train_dataset(self, parameters):
+        status = True
+        self._train_dataset_generator = ClassifierBatchGenerator()
+        status = self._train_dataset_generator.load_train_dataset(
+            parameters) and status
+        retur(status)
+
+    def _setup_val_dataset(self, parameters):
+        status = True
+        self._val_dataset_generator = ClassifierBatchGenerator()
+        status = self._val_dataset_generator.load_val_dataset(
+            parameters) and status
+        retur(status)
+
+    def _setup_test_dataset(self, parameters):
+        status = True
+        self._test_dataset_generator = ClassifierBatchGenerator()
+        status = self._test_dataset_generator.load_test_dataset(
+            parameters) and status
+        retur(status)

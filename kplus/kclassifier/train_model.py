@@ -28,8 +28,6 @@ import sys
 import argparse
 import json
 
-from kplus.kclassifier.datasets.ClassifierBatchGenerator import ClassifierBatchGenerator
-
 from keras.layers import Input
 from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard, ReduceLROnPlateau
 from keras.layers.core import Dense, Dropout, Flatten
@@ -56,17 +54,6 @@ def main(args):
         parameters = json.loads(input_buffer.read())
 
     status = True
-
-    train_dataset = ClassifierBatchGenerator()
-    status = train_dataset.load_train_dataset(parameters) and status
-
-    val_dataset = ClassifierBatchGenerator()
-    status = val_dataset.load_val_dataset(parameters) and status
-
-    test_dataset = ClassifierBatchGenerator()
-    status = test_dataset.load_test_dataset(parameters) and status
-    #X, y = test_dataset[1]
-    #print(y)
 
     input_layer = Input(shape=(224, 224, 3))
     base_model = ResNet50(
