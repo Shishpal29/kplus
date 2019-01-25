@@ -24,7 +24,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from kplus.core.AbstractApplication import AbstractApplication
 
-class AbstractClassifier(object):
+
+class AbstractClassifier(AbstractApplication):
     def __init__(self):
-        pass
+        AbstractApplication.__init__(self)

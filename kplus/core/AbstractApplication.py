@@ -39,13 +39,13 @@ class AbstractApplication(object):
         self._tensorboard = None
 
         self._train_dataset_generator = None
+        self._val_dataset_generator = None
         self._test_dataset_generator = None
 
-    def _setup_model(self, parameters, is_training):
-        return (False)
+    def load_weights(self, weight_path):
+        self._keras_model.load_weights(weight_path)
 
     def _setup_callbacks(self, parameters):
-
         train_root_dir = os.path.expanduser(
             parameters['train']['train_root_dir'])
         checkpoint_path = os.path.join(train_root_dir,
@@ -63,11 +63,19 @@ class AbstractApplication(object):
         train_dataset_dir = parameters['train']['dataset_dir']
         train_batch_size = parameters['train']['batch_size']
 
+        val_batch_size = parameters['val']['batch_size']
+        val_dataset_dir = parameters['val']['dataset_dir']
+
         test_batch_size = parameters['test']['batch_size']
         test_dataset_dir = parameters['test']['dataset_dir']
-        status = self._setup_train_dataset(
-            train_dataset_dir, train_batch_size) and self._setup_test_dataset(
-                test_dataset_dir, test_batch_size) and status
+
+        status = self._setup_train_dataset(train_dataset_dir,
+                                           train_batch_size) and status
+        status = self._setup_val_dataset(val_dataset_dir,
+                                         val_batch_size) and status
+        status = self._setup_test_dataset(test_dataset_dir,
+                                          test_batch_size) and status
+
         return (status)
 
     def _setup_early_stop(self):
@@ -110,15 +118,6 @@ class AbstractApplication(object):
             min_lr=1e-7)
         return (True)
 
-    def _setup_train_dataset(self, train_dataset_dir):
-        return (False)
-
-    def _setup_test_dataset(self, test_dataset_dir):
-        return (False)
-
-    def _train_model(self, parameters):
-        return (False)
-
     def train(self, parameters):
 
         status = True
@@ -139,6 +138,21 @@ class AbstractApplication(object):
             return (False)
 
         return (status)
+
+    def _setup_model(self, parameters, is_training):
+        raise NotImplementedError('Must be implemented by the subclass.')
+
+    def _setup_train_dataset(self, train_dataset_dir, train_batch_size):
+        raise NotImplementedError('Must be implemented by the subclass.')
+
+    def _setup_val_dataset(self, val_dataset_dir, val_batch_size):
+        raise NotImplementedError('Must be implemented by the subclass.')
+
+    def _setup_test_dataset(self, test_dataset_dir, test_batch_size):
+        raise NotImplementedError('Must be implemented by the subclass.')
+
+    def _train_model(self, parameters):
+        raise NotImplementedError('Must be implemented by the subclass.')
 
     def evaluate(self, parameters):
         raise NotImplementedError('Must be implemented by the subclass.')

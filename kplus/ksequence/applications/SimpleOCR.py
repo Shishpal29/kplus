@@ -39,6 +39,7 @@ from kplus.core.AbstractApplication import AbstractApplication
 
 class SimpleOCR(AbstractApplication):
     def __init__(self):
+        AbstractApplication.__init__(self)
         self._image_width = 128
         self._image_height = 64
         self._downsample_factor = 4
@@ -94,6 +95,14 @@ class SimpleOCR(AbstractApplication):
             self._image_height, train_batch_size, self._downsample_factor,
             self._maximum_text_length)
         self._train_dataset_generator.build_data()
+        return (True)
+
+    def _setup_val_dataset(self, val_dataset_dir, val_batch_size):
+        self._val_dataset_generator = SimpleGenerator(
+            self._model_letters, val_dataset_dir, self._image_width,
+            self._image_height, val_batch_size, self._downsample_factor,
+            self._maximum_text_length)
+        self._val_dataset_generator.build_data()
         return (True)
 
     def _setup_test_dataset(self, test_dataset_dir, test_batch_size):

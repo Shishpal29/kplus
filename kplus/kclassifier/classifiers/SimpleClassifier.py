@@ -24,21 +24,32 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import keras
+
 from kplus.kclassifier.classifiers.AbstractClassifier import AbstractClassifier
 
 
 class SimpleClassifier(AbstractClassifier):
     def __init__(self):
-        self._model = None
+        AbstractClassifier.__init__(self)
 
-    def load_weights(self, weight_path):
-        self._model.load_weights(weight_path)
+    def _setup_model(self, parameters, is_training):
+        raise NotImplementedError('Must be implemented by the subclass.')
 
-    def train(self):
-        pass
+    def _setup_train_dataset(self, train_dataset_dir, train_batch_size):
+        raise NotImplementedError('Must be implemented by the subclass.')
 
-    def evaluate(self):
-        pass
+    def _setup_val_dataset(self, val_dataset_dir, val_batch_size):
+        raise NotImplementedError('Must be implemented by the subclass.')
 
-    def predict(self):
-        pass
+    def _setup_test_dataset(self, test_dataset_dir, test_batch_size):
+        raise NotImplementedError('Must be implemented by the subclass.')
+
+    def _train_model(self, parameters):
+        raise NotImplementedError('Must be implemented by the subclass.')
+
+    def evaluate(self, parameters):
+        return (True)
+
+    def predict(self, input_image):
+        return (True)
