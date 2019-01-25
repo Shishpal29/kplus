@@ -37,18 +37,18 @@ class AbstractClassifier(AbstractApplication):
         self._train_dataset_generator = ClassifierBatchGenerator()
         status = self._train_dataset_generator.load_train_dataset(
             parameters) and status
-        retur(status)
+        return (status)
 
     def _setup_val_dataset(self, parameters):
         status = True
         self._val_dataset_generator = ClassifierBatchGenerator()
         status = self._val_dataset_generator.load_val_dataset(
             parameters) and status
-        retur(status)
+        return (status)
 
     def _setup_test_dataset(self, parameters):
         status = True
         self._test_dataset_generator = ClassifierBatchGenerator()
         status = self._test_dataset_generator.load_test_dataset(
             parameters) and status
-        retur(status)
+        return (status)

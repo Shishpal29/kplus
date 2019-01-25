@@ -25,6 +25,10 @@ from __future__ import division
 from __future__ import print_function
 
 import keras
+from keras.layers import Input
+from keras.layers.core import Dense, Dropout, Flatten
+from keras.models import Model
+from keras.applications.resnet50 import ResNet50
 
 from kplus.kclassifier.classifiers.AbstractClassifier import AbstractClassifier
 
@@ -34,10 +38,23 @@ class SimpleClassifier(AbstractClassifier):
         AbstractClassifier.__init__(self)
 
     def _setup_model(self, parameters, is_training):
-        raise NotImplementedError('Must be implemented by the subclass.')
+        input_layer = Input(shape=(224, 224, 3))
+        base_model = ResNet50(
+            weights=None, include_top=False, input_tensor=input_layer)
 
-    def _train_model(self, parameters):
-        raise NotImplementedError('Must be implemented by the subclass.')
+        x = base_model.output
+        x = Flatten()(x)
+        x = Dense(1024, activation='relu')(x)
+        x = Dropout(0.5)(x)
+        predictions = Dense(5, activation='softmax')(x)
+
+        self._keras_model = Model(input=base_model.input, output=predictions)
+        self._keras_model.compile(
+            optimizer='adam',
+            loss='categorical_crossentropy',
+            metrics=['categorical_accuracy'])
+
+        return (True)
 
     def evaluate(self, parameters):
         return (True)

@@ -116,7 +116,7 @@ class SimpleOCR(AbstractApplication):
     def _train_model(self, parameters):
         epoch = parameters['train']['max_number_of_epoch']
         train_batch_size = parameters['train']['batch_size']
-        test_batch_size = parameters['test']['batch_size']
+        test_batch_size = parameters['val']['batch_size']
         self._keras_model.fit_generator(
             generator=self._train_dataset_generator.next_batch(),
             steps_per_epoch=int(

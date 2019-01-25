@@ -19,6 +19,12 @@
 		"model_name" : "model--{epoch:03d}--{val_loss:0.5f}.hdf5"
     },
 
+    "val" : {	    
+		"dataset_dir" : "./datasets/val/",
+		"batch_size" : 16,
+		"model_name" : "model--030.hdf5"    
+    },
+
     "test" : {	    
 		"dataset_dir" : "./datasets/test/",
 		"batch_size" : 16,

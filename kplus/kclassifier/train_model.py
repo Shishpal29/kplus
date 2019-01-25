@@ -28,11 +28,7 @@ import sys
 import argparse
 import json
 
-from keras.layers import Input
-from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard, ReduceLROnPlateau
-from keras.layers.core import Dense, Dropout, Flatten
-from keras.models import Model
-from keras.applications.resnet50 import ResNet50
+from kplus.kclassifier.classifiers.SimpleClassifier import SimpleClassifier
 
 
 def parse_arguments(argv):
@@ -53,39 +49,8 @@ def main(args):
     with open(parameter_filename) as input_buffer:
         parameters = json.loads(input_buffer.read())
 
-    status = True
-
-    input_layer = Input(shape=(224, 224, 3))
-    base_model = ResNet50(
-        weights=None, include_top=False, input_tensor=input_layer)
-
-    x = base_model.output
-    x = Flatten()(x)
-    x = Dense(1024, activation='relu')(x)
-    x = Dropout(0.5)(x)
-    predictions = Dense(5, activation='softmax')(x)
-
-    model = Model(input=base_model.input, output=predictions)
-    model.compile(
-        optimizer='adam',
-        loss='categorical_crossentropy',
-        metrics=['categorical_accuracy'])
-
-    checkpoint = ModelCheckpoint(
-        filepath='./train/', monitor='loss', verbose=1, mode='auto', period=1)
-
-    model.fit_generator(
-        generator=train_dataset,
-        steps_per_epoch=train_dataset.steps_per_epoch(),
-        callbacks=[checkpoint],
-        epochs=5,
-        validation_data=val_dataset,
-        validation_steps=val_dataset.steps_per_epoch())
-
-    if (status):
-        print('The model is trained.')
-    else:
-        print('Error training the model.')
+    application = SimpleClassifier()
+    application.train(parameters)
 
 
 if __name__ == '__main__':
