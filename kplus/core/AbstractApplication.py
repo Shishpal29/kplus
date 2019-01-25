@@ -101,11 +101,12 @@ class AbstractApplication(object):
     def train(self, parameters):
 
         status = True
-        status = self._setup_model(parameters, is_training=True) and status
+
+        status = self._setup_datasets(parameters) and status
         if (not status):
             return (False)
 
-        status = self._setup_datasets(parameters) and status
+        status = self._setup_model(parameters, is_training=True) and status
         if (not status):
             return (False)
 

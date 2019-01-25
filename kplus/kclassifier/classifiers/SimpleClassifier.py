@@ -38,23 +38,31 @@ class SimpleClassifier(AbstractClassifier):
         AbstractClassifier.__init__(self)
 
     def _setup_model(self, parameters, is_training):
+
+        feature_extractor = parameters['model']['feature_extractor']
+        if (not (feature_extractor in ['resnet_50'])):
+            return (False)
+        self.use_feature_extractor(feature_extractor)
+
         self._image_width = parameters['model']['image_width']
         self._image_height = parameters['model']['image_height']
         self._number_of_channels = parameters['model']['number_of_channels']
 
+        input_shape = (self._image_width, self._image_height,
+                       self._number_of_channels)
         input_layer = Input(
-            shape=(self._image_width, self._image_height,
-                   self._number_of_channels))
-        base_model = ResNet50(
-            weights=None, include_top=False, input_tensor=input_layer)
+            name='input_layer', shape=input_shape, dtype='float32')
 
-        x = base_model.output
-        x = Flatten()(x)
+        self._feature_extractor.build(input_shape=input_shape)
+        features = self._feature_extractor.extract_features(input_layer)
+
+        x = Flatten()(features)
         x = Dense(1024, activation='relu')(x)
         x = Dropout(0.5)(x)
-        predictions = Dense(5, activation='softmax')(x)
+        predictions = Dense(
+            self._train_dataset.number_of_classes(), activation='softmax')(x)
 
-        self._keras_model = Model(input=base_model.input, output=predictions)
+        self._keras_model = Model(input=input_layer, output=predictions)
         self._keras_model.compile(
             optimizer='adam',
             loss='categorical_crossentropy',

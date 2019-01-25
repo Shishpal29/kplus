@@ -25,7 +25,9 @@ from __future__ import division
 from __future__ import print_function
 
 from kplus.core.AbstractApplication import AbstractApplication
+
 from kplus.kclassifier.datasets.ClassifierBatchGenerator import ClassifierBatchGenerator
+from kplus.kclassifier.models.ModelFactory import ModelFactory
 
 
 class AbstractClassifier(AbstractApplication):
@@ -34,6 +36,11 @@ class AbstractClassifier(AbstractApplication):
         self._image_width = 224
         self._image_height = 224
         self._number_of_channels = 3
+
+        self._feature_extractor = None
+
+    def use_feature_extractor(self, feature_extractor):
+        self._feature_extractor = ModelFactory.simple_model(feature_extractor)
 
     def _setup_train_dataset(self, parameters):
         self._train_dataset = ClassifierBatchGenerator()

@@ -2,7 +2,8 @@
     "model" : {
 		"image_width" : 224,
 		"image_height" : 224,
-		"number_of_channels" : 3
+		"number_of_channels" : 3,
+		"feature_extractor" : "resnet_50"
     },
 
     "train" : {	    
