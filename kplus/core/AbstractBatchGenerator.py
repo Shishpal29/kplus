@@ -78,11 +78,17 @@ class AbstractBatchGenerator(keras.utils.Sequence):
     def labels_filename(self):
         return (self._labels_filename)
 
+    def number_of_classes(self):
+        return (self._number_of_classes)
+
     def number_of_samples(self):
         return (len(self._dataset))
 
+    def batch_size(self):
+        return (self._batch_size)
+
     def steps_per_epoch(self):
-        return (int(self.number_of_samples() / self._batch_size))
+        return (int(self.number_of_samples() / self.batch_size()))
 
     def _generate_labels(self, source_root_dir, target_root_dir):
 
@@ -199,8 +205,8 @@ class AbstractBatchGenerator(keras.utils.Sequence):
                     }
                     #print(source_file_name, class_label)
                     self._dataset.append(current_data)
-                    number_of_samples = number_of_samples + 1
                     self._identifiers.append(number_of_samples)
+                    number_of_samples = number_of_samples + 1
 
         #print(self._dataset)
         #print(self._identifiers)
@@ -257,11 +263,8 @@ class AbstractBatchGenerator(keras.utils.Sequence):
         for index in range(lower_bound, upper_bound):
             target_index = index - lower_bound
             source_identifier = self._identifiers[index]
-            print(index, target_index, source_identifier,
-                  self._dataset[source_identifier][AbstractBatchGenerator.
-                                                   filename_tag()],
-                  self._dataset[source_identifier][AbstractBatchGenerator.
-                                                   label_tag()])
+            print(source_identifier)
+            #print(index, target_index, source_identifier, self._dataset[source_identifier][AbstractBatchGenerator.filename_tag()], self._dataset[source_identifier][AbstractBatchGenerator.label_tag()])
             input_image = cv2.imread(
                 self._dataset[source_identifier][
                     AbstractBatchGenerator.filename_tag()], cv2.IMREAD_COLOR)
@@ -274,4 +277,5 @@ class AbstractBatchGenerator(keras.utils.Sequence):
             y[target_index] = self._dataset[source_identifier][
                 AbstractBatchGenerator.label_tag()]
 
-        return X, keras.utils.np_utils.to_categorical(y)
+        return X, keras.utils.np_utils.to_categorical(y,
+                                                      self.number_of_classes())
