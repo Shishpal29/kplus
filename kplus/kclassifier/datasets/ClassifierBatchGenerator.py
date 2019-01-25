@@ -31,24 +31,12 @@ import numpy as np
 import keras
 import cv2
 
-from kplus.datasets.AbstractBatchGenerator import AbstractBatchGenerator
+from kplus.core.AbstractBatchGenerator import AbstractBatchGenerator
 
 
 class ClassifierBatchGenerator(AbstractBatchGenerator):
 
     _minimum_images = 1
-
-    @classmethod
-    def train_split_name(cls):
-        return ('train')
-
-    @classmethod
-    def val_split_name(cls):
-        return ('val')
-
-    @classmethod
-    def test_split_name(cls):
-        return ('test')
 
     @classmethod
     def filename_tag(cls):
@@ -66,8 +54,6 @@ class ClassifierBatchGenerator(AbstractBatchGenerator):
         self._labels_to_class_names = None
         self._class_names_to_labels = None
 
-        self._dataset = []
-        self._identifiers = []
         self._number_of_classes = 0
 
         self._patterns = ["*.jpg", "*.jpeg", "*.png", "*.bmp"]
@@ -75,25 +61,11 @@ class ClassifierBatchGenerator(AbstractBatchGenerator):
         self._image_height = 0
         self._number_of_channels = 0
 
-        self._batch_size = 0
-        self._shuffle = True
-
-        self._random_seed = 7
-
     def labels_filename(self):
         return (self._labels_filename)
 
     def number_of_classes(self):
         return (self._number_of_classes)
-
-    def number_of_samples(self):
-        return (len(self._dataset))
-
-    def batch_size(self):
-        return (self._batch_size)
-
-    def steps_per_epoch(self):
-        return (int(self.number_of_samples() / self.batch_size()))
 
     def _generate_labels(self, source_root_dir, target_root_dir):
 
@@ -164,10 +136,6 @@ class ClassifierBatchGenerator(AbstractBatchGenerator):
 
         return (True)
 
-    def on_epoch_end(self):
-        if (self._shuffle == True):
-            random.shuffle(self._identifiers)
-
     def _load_dataset(self, dataset_dir):
         if ((not os.path.exists(dataset_dir))
                 or (not os.path.isdir(dataset_dir))):
@@ -197,14 +165,14 @@ class ClassifierBatchGenerator(AbstractBatchGenerator):
                     class_images = class_images + images
                 number_of_images = number_of_images + current_images
 
-            if (number_of_images >= AbstractBatchGenerator._minimum_images):
+            if (number_of_images >= ClassifierBatchGenerator._minimum_images):
                 for image in class_images:
                     source_file_name = os.path.join(class_source_dir, image)
                     class_label = self._class_names_to_labels[class_name]
                     current_data = {
-                        AbstractBatchGenerator.filename_tag():
+                        ClassifierBatchGenerator.filename_tag():
                         source_file_name,
-                        AbstractBatchGenerator.label_tag(): class_label
+                        ClassifierBatchGenerator.label_tag(): class_label
                     }
 
                     self._dataset.append(current_data)
@@ -230,21 +198,6 @@ class ClassifierBatchGenerator(AbstractBatchGenerator):
 
         return (self._load_dataset(dataset_dir))
 
-    def load_train_dataset(self, parameters):
-        split_name = AbstractBatchGenerator.train_split_name()
-        return (self._load_split(split_name, parameters))
-
-    def load_val_dataset(self, parameters):
-        split_name = AbstractBatchGenerator.val_split_name()
-        return (self._load_split(split_name, parameters))
-
-    def load_test_dataset(self, parameters):
-        split_name = AbstractBatchGenerator.test_split_name()
-        return (self._load_split(split_name, parameters))
-
-    def __len__(self):
-        return (int(np.ceil(self.number_of_samples() / self._batch_size)))
-
     def __getitem__(self, batch_index):
 
         lower_bound = batch_index * self._batch_size
@@ -262,9 +215,9 @@ class ClassifierBatchGenerator(AbstractBatchGenerator):
             target_index = index - lower_bound
             source_identifier = self._identifiers[index]
 
-            filename = self._dataset[source_identifier][AbstractBatchGenerator.
-                                                        filename_tag()]
-            label = self._dataset[source_identifier][AbstractBatchGenerator.
+            filename = self._dataset[source_identifier][
+                ClassifierBatchGenerator.filename_tag()]
+            label = self._dataset[source_identifier][ClassifierBatchGenerator.
                                                      label_tag()]
 
             input_image = cv2.imread(filename, cv2.IMREAD_COLOR)
