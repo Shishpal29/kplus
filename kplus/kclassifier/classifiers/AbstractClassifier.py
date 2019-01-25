@@ -31,21 +31,21 @@ from kplus.kclassifier.datasets.ClassifierBatchGenerator import ClassifierBatchG
 class AbstractClassifier(AbstractApplication):
     def __init__(self):
         AbstractApplication.__init__(self)
+        self._image_width = 224
+        self._image_height = 224
+        self._number_of_channels = 3
 
     def _setup_train_dataset(self, parameters):
-        status = True
         self._train_dataset = ClassifierBatchGenerator()
-        status = self._train_dataset.load_train_dataset(parameters) and status
-        return (status)
+        self._train_dataset.load_train_dataset(parameters)
+        return (True)
 
     def _setup_val_dataset(self, parameters):
-        status = True
         self._val_dataset = ClassifierBatchGenerator()
-        status = self._val_dataset.load_val_dataset(parameters) and status
-        return (status)
+        self._val_dataset.load_val_dataset(parameters)
+        return (True)
 
     def _setup_test_dataset(self, parameters):
-        status = True
         self._test_dataset = ClassifierBatchGenerator()
-        status = self._test_dataset.load_test_dataset(parameters) and status
-        return (status)
+        self._test_dataset.load_test_dataset(parameters)
+        return (True)

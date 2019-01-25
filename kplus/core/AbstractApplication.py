@@ -134,23 +134,23 @@ class AbstractApplication(object):
 
         return (True)
 
-    def _setup_model(self, parameters, is_training):
-        raise NotImplementedError('Must be implemented by the subclass.')
-
     def _setup_train_dataset(self, parameters):
-        raise NotImplementedError('Must be implemented by the subclass.')
+        return (False)
 
     def _setup_val_dataset(self, parameters):
-        raise NotImplementedError('Must be implemented by the subclass.')
+        return (False)
 
     def _setup_test_dataset(self, parameters):
-        raise NotImplementedError('Must be implemented by the subclass.')
+        return (False)
 
     def _setup_datasets(self, parameters):
         self._setup_train_dataset(parameters)
         self._setup_val_dataset(parameters)
         self._setup_test_dataset(parameters)
         return (True)
+
+    def _setup_model(self, parameters, is_training):
+        raise NotImplementedError('Must be implemented by the subclass.')
 
     def evaluate(self, parameters):
         raise NotImplementedError('Must be implemented by the subclass.')

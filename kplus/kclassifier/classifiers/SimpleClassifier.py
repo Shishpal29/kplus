@@ -38,7 +38,13 @@ class SimpleClassifier(AbstractClassifier):
         AbstractClassifier.__init__(self)
 
     def _setup_model(self, parameters, is_training):
-        input_layer = Input(shape=(224, 224, 3))
+        self._image_width = parameters['model']['image_width']
+        self._image_height = parameters['model']['image_height']
+        self._number_of_channels = parameters['model']['number_of_channels']
+
+        input_layer = Input(
+            shape=(self._image_width, self._image_height,
+                   self._number_of_channels))
         base_model = ResNet50(
             weights=None, include_top=False, input_tensor=input_layer)
 
