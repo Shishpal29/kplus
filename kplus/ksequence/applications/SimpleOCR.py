@@ -89,28 +89,30 @@ class SimpleOCR(AbstractApplication):
 
         return (True)
 
+    def _setup_dataset(self, dataset_dir, batch_size):
+        dataset = SimpleGenerator(self._model_letters, dataset_dir,
+                                  self._image_width, self._image_height,
+                                  batch_size, self._downsample_factor,
+                                  self._maximum_text_length)
+        dataset.build_data()
+        return (dataset)
+
     def _setup_train_dataset(self, train_dataset_dir, train_batch_size):
-        self._train_dataset_generator = SimpleGenerator(
-            self._model_letters, train_dataset_dir, self._image_width,
-            self._image_height, train_batch_size, self._downsample_factor,
-            self._maximum_text_length)
-        self._train_dataset_generator.build_data()
+        dataset_dir = parameters['train']['dataset_dir']
+        batch_size = parameters['train']['batch_size']
+        self._train_dataset = self._setup_dataset(dataset_dir, batch_size)
         return (True)
 
     def _setup_val_dataset(self, val_dataset_dir, val_batch_size):
-        self._val_dataset_generator = SimpleGenerator(
-            self._model_letters, val_dataset_dir, self._image_width,
-            self._image_height, val_batch_size, self._downsample_factor,
-            self._maximum_text_length)
-        self._val_dataset_generator.build_data()
+        dataset_dir = parameters['val']['dataset_dir']
+        batch_size = parameters['val']['batch_size']
+        self._val_dataset = self._setup_dataset(dataset_dir, batch_size)
         return (True)
 
     def _setup_test_dataset(self, test_dataset_dir, test_batch_size):
-        self._test_dataset_generator = SimpleGenerator(
-            self._model_letters, test_dataset_dir, self._image_width,
-            self._image_height, test_batch_size, self._downsample_factor,
-            self._maximum_text_length)
-        self._test_dataset_generator.build_data()
+        dataset_dir = parameters['test']['dataset_dir']
+        batch_size = parameters['test']['batch_size']
+        self._test_dataset = self._setup_dataset(dataset_dir, batch_size)
         return (True)
 
     def _train_model(self, parameters):
@@ -118,17 +120,15 @@ class SimpleOCR(AbstractApplication):
         train_batch_size = parameters['train']['batch_size']
         test_batch_size = parameters['val']['batch_size']
         self._keras_model.fit_generator(
-            generator=self._train_dataset_generator.next_batch(),
-            steps_per_epoch=int(
-                self._train_dataset_generator.n / train_batch_size),
+            generator=self._train_dataset.next_batch(),
+            steps_per_epoch=int(self._train_dataset.n / train_batch_size),
             callbacks=[
                 self._checkpoint, self._early_stop, self._change_learning_rate,
                 self._tensorboard
             ],
             epochs=epoch,
-            validation_data=self._test_dataset_generator.next_batch(),
-            validation_steps=int(
-                self._test_dataset_generator.n / test_batch_size))
+            validation_data=self._test_dataset.next_batch(),
+            validation_steps=int(self._test_dataset.n / test_batch_size))
 
         return (True)
 

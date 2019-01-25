@@ -38,9 +38,9 @@ class AbstractApplication(object):
         self._change_learning_rate = None
         self._tensorboard = None
 
-        self._train_dataset_generator = None
-        self._val_dataset_generator = None
-        self._test_dataset_generator = None
+        self._train_dataset = None
+        self._val_dataset = None
+        self._test_dataset = None
 
     def load_weights(self, weight_path):
         self._keras_model.load_weights(weight_path)
@@ -79,8 +79,7 @@ class AbstractApplication(object):
             patience=3,
             verbose=1,
             mode='auto',
-            #epsilon=0.01,
-            #min_delta=0.0,
+            epsilon=0.0001,
             cooldown=1,
             min_lr=1e-7)
         return (True)
@@ -123,15 +122,15 @@ class AbstractApplication(object):
     def _train_model(self, parameters):
         epoch = parameters['train']['max_number_of_epoch']
         self._keras_model.fit_generator(
-            generator=self._train_dataset_generator,
-            steps_per_epoch=self._train_dataset_generator.steps_per_epoch(),
+            generator=self._train_dataset,
+            steps_per_epoch=self._train_dataset.steps_per_epoch(),
             callbacks=[
                 self._checkpoint, self._early_stop, self._change_learning_rate,
                 self._tensorboard
             ],
             epochs=epoch,
-            validation_data=self._val_dataset_generator,
-            validation_steps=self._val_dataset_generator.steps_per_epoch())
+            validation_data=self._val_dataset,
+            validation_steps=self._val_dataset.steps_per_epoch())
 
         return (True)
 
@@ -148,12 +147,10 @@ class AbstractApplication(object):
         raise NotImplementedError('Must be implemented by the subclass.')
 
     def _setup_datasets(self, parameters):
-        status = True
-        status = self._setup_train_dataset(parameters) and status
-        status = self._setup_val_dataset(parameters) and status
-        status = self._setup_test_dataset(parameters) and status
-
-        return (status)
+        self._setup_train_dataset(parameters)
+        self._setup_val_dataset(parameters)
+        self._setup_test_dataset(parameters)
+        return (True)
 
     def evaluate(self, parameters):
         raise NotImplementedError('Must be implemented by the subclass.')
