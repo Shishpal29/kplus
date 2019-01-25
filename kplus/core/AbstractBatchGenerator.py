@@ -61,6 +61,7 @@ class AbstractBatchGenerator(keras.utils.Sequence):
 
         self._labels_to_class_names = None
         self._class_names_to_labels = None
+
         self._dataset = []
         self._identifiers = []
         self._number_of_classes = 0
@@ -156,14 +157,12 @@ class AbstractBatchGenerator(keras.utils.Sequence):
                 line[:index])
 
         self._number_of_classes = len(self._class_names_to_labels)
-        #print(self._number_of_classes, self._labels_to_class_names, self._class_names_to_labels)
 
         return (True)
 
     def on_epoch_end(self):
         if (self._shuffle == True):
-            np.random.shuffle(self._identifiers)
-        #print(self._identifiers)
+            random.shuffle(self._identifiers)
 
     def _load_dataset(self, dataset_dir):
         if ((not os.path.exists(dataset_dir))
@@ -203,13 +202,10 @@ class AbstractBatchGenerator(keras.utils.Sequence):
                         source_file_name,
                         AbstractBatchGenerator.label_tag(): class_label
                     }
-                    #print(source_file_name, class_label)
+
                     self._dataset.append(current_data)
                     self._identifiers.append(number_of_samples)
                     number_of_samples = number_of_samples + 1
-
-        #print(self._dataset)
-        #print(self._identifiers)
 
         self.on_epoch_end()
 
@@ -254,28 +250,27 @@ class AbstractBatchGenerator(keras.utils.Sequence):
             upper_bound = self.number_of_samples()
             lower_bound = upper_bound - self._batch_size
 
-        #print(lower_bound,upper_bound, self._batch_size)
-
         X = np.empty((self._batch_size, self._image_height, self._image_width,
                       self._number_of_channels))
-        y = np.empty((self._batch_size), dtype=int)
+        y = np.empty((self._batch_size, self.number_of_classes()), dtype=int)
 
         for index in range(lower_bound, upper_bound):
             target_index = index - lower_bound
             source_identifier = self._identifiers[index]
-            print(source_identifier)
-            #print(index, target_index, source_identifier, self._dataset[source_identifier][AbstractBatchGenerator.filename_tag()], self._dataset[source_identifier][AbstractBatchGenerator.label_tag()])
-            input_image = cv2.imread(
-                self._dataset[source_identifier][
-                    AbstractBatchGenerator.filename_tag()], cv2.IMREAD_COLOR)
+
+            filename = self._dataset[source_identifier][AbstractBatchGenerator.
+                                                        filename_tag()]
+            label = self._dataset[source_identifier][AbstractBatchGenerator.
+                                                     label_tag()]
+
+            input_image = cv2.imread(filename, cv2.IMREAD_COLOR)
             input_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2RGB)
             input_image = cv2.resize(input_image,
                                      (self._image_width, self._image_height))
             #input_image = np.asarray(input_image, dtype='float32')
 
             X[target_index] = input_image
-            y[target_index] = self._dataset[source_identifier][
-                AbstractBatchGenerator.label_tag()]
+            y[target_index] = keras.utils.np_utils.to_categorical(
+                label, self.number_of_classes())
 
-        return X, keras.utils.np_utils.to_categorical(y,
-                                                      self.number_of_classes())
+        return (X, y)
