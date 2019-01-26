@@ -23,3 +23,35 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+
+import sys
+import os
+import argparse
+import json
+
+from kplus.ksequence.applications.SimpleOCR import SimpleOCR
+
+
+def parse_arguments(argv):
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        '--parameters',
+        type=str,
+        help='Input parameter json file used for evaluating the OCR model.', default='./parameters/parameters.json')
+
+    return (parser.parse_args(argv))
+
+
+def main(args):
+    parameter_filename = args.parameters
+
+    with open(parameter_filename) as input_buffer:
+        parameters = json.loads(input_buffer.read())
+
+    application = SimpleOCR()
+    application.evaluate(parameters)
+
+
+if __name__ == '__main__':
+    main(parse_arguments(sys.argv[1:]))

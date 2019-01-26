@@ -35,16 +35,16 @@ def parse_arguments(argv):
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        '--parameter_filename',
+        '--parameters',
         type=str,
-        help='Input parameter file name.',
+        help='Input parameter json file used for training the classifier model.',
         default='./parameters/parameters.json')
 
     return (parser.parse_args(argv))
 
 
 def main(args):
-    parameter_filename = args.parameter_filename
+    parameter_filename = args.parameters
 
     with open(parameter_filename) as input_buffer:
         parameters = json.loads(input_buffer.read())
