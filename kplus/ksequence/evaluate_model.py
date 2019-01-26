@@ -38,7 +38,8 @@ def parse_arguments(argv):
     parser.add_argument(
         '--parameters',
         type=str,
-        help='Input parameter json file used for evaluating the OCR model.', default='./parameters/parameters.json')
+        help='Input parameter json file used for evaluating the OCR model.', 
+        default='./parameters/parameters.json')
 
     return (parser.parse_args(argv))
 
