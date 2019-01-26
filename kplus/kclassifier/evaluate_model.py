@@ -52,7 +52,7 @@ def main(args):
     application = SimpleClassifier()
     application.evaluate(parameters)
 
-
 if __name__ == '__main__':
     main(parse_arguments(sys.argv[1:]))
+
 
