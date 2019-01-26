@@ -39,7 +39,7 @@ def parse_arguments(argv):
         '--parameters',
         type=str,
         help='Input parameter json file used for training the OCR model.', 
-        default='./parameters/parameters.json')
+        default='kplus/ksequence/parameters/vehicle_number_plate.json')
 
     return (parser.parse_args(argv))
 

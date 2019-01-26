@@ -38,7 +38,7 @@ def parse_arguments(argv):
         '--parameters',
         type=str,
         help='Input parameter json file used for training the classifier model.',
-        default='./parameters/flowers.json')
+        default='kplus/kclassifier/parameters/flowers.json')
 
     return (parser.parse_args(argv))
 
