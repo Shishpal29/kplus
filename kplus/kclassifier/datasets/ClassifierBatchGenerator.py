@@ -31,7 +31,7 @@ import numpy as np
 import keras
 import cv2
 
-from kplus.core.AbstractBatchGenerator import AbstractBatchGenerator
+from kplus.datasets.AbstractBatchGenerator import AbstractBatchGenerator
 
 
 class ClassifierBatchGenerator(AbstractBatchGenerator):
