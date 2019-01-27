@@ -126,8 +126,8 @@ class SimpleOCR(AbstractApplication):
                 self._tensorboard
             ],
             epochs=epoch,
-            validation_data=self._test_dataset.next_batch(),
-            validation_steps=self._test_dataset.steps_per_epoch())
+            validation_data=self._val_dataset.next_batch(),
+            validation_steps=self._val_dataset.steps_per_epoch())
 
         return (True)
 
@@ -136,4 +136,3 @@ class SimpleOCR(AbstractApplication):
 
     def predict(self, input_image):
         return (True)
-
