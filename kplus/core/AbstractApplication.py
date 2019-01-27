@@ -45,22 +45,12 @@ class AbstractApplication(object):
     def load_weights(self, weight_path):
         self._keras_model.load_weights(weight_path)
 
-    def _setup_early_stop(self):
-        #self._early_stop = EarlyStopping(monitor='loss', min_delta=0.001, patience=5, mode='min', verbose=1)
-        self._early_stop = EarlyStopping(
-            monitor='val_loss',
-            min_delta=0.0,
-            patience=5,
-            mode='auto',
-            verbose=1)
-        return (True)
-
     def _setup_model_checkpoint(self, checkpoint_path):
         self._checkpoint = ModelCheckpoint(
             filepath=checkpoint_path,
             monitor='loss',
             verbose=1,
-            mode='min',
+            mode='auto',
             period=1)
         return (True)
 
@@ -70,6 +60,16 @@ class AbstractApplication(object):
             histogram_freq=0,
             write_graph=True,
             write_images=False)
+        return (True)
+
+    def _setup_early_stop(self):
+        #self._early_stop = EarlyStopping(monitor='loss', min_delta=0.001, patience=5, mode='min', verbose=1)
+        self._early_stop = EarlyStopping(
+            monitor='val_loss',
+            min_delta=0.0,
+            patience=5,
+            mode='auto',
+            verbose=1)
         return (True)
 
     def _setup_learning_rate(self):
@@ -98,28 +98,6 @@ class AbstractApplication(object):
         status = self._setup_learning_rate() and status
         return (status)
 
-    def train(self, parameters):
-
-        status = True
-
-        status = self._setup_datasets(parameters) and status
-        if (not status):
-            return (False)
-
-        status = self._setup_model(parameters, is_training=True) and status
-        if (not status):
-            return (False)
-
-        status = self._setup_callbacks(parameters) and status
-        if (not status):
-            return (False)
-
-        status = self._train_model(parameters) and status
-        if (not status):
-            return (False)
-
-        return (status)
-
     def _train_model(self, parameters):
         epoch = parameters['train']['max_number_of_epoch']
         self._keras_model.fit_generator(
@@ -144,14 +122,42 @@ class AbstractApplication(object):
     def _setup_test_dataset(self, parameters):
         return (False)
 
-    def _setup_datasets(self, parameters):
+    def _setup_train_datasets(self, parameters):
         self._setup_train_dataset(parameters)
         self._setup_val_dataset(parameters)
-        self._setup_test_dataset(parameters)
         return (True)
+
+    def _setup_loss_function(self, parameters):
+        raise NotImplementedError('Must be implemented by the subclass.')
 
     def _setup_model(self, parameters, is_training):
         raise NotImplementedError('Must be implemented by the subclass.')
+
+    def train(self, parameters):
+
+        status = True
+
+        status = self._setup_train_datasets(parameters) and status
+        if (not status):
+            return (False)
+
+        status = self._setup_model(parameters, is_training=True) and status
+        if (not status):
+            return (False)
+
+        status = self._setup_loss_function(parameters) and status
+        if (not status):
+            return (False)
+
+        status = self._setup_callbacks(parameters) and status
+        if (not status):
+            return (False)
+
+        status = self._train_model(parameters) and status
+        if (not status):
+            return (False)
+
+        return (status)
 
     def evaluate(self, parameters):
         raise NotImplementedError('Must be implemented by the subclass.')

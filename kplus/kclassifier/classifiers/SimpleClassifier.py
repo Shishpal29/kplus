@@ -63,10 +63,6 @@ class SimpleClassifier(AbstractClassifier):
             self._train_dataset.number_of_classes(), activation='softmax')(x)
 
         self._keras_model = Model(input=input_layer, output=predictions)
-        self._keras_model.compile(
-            optimizer='adam',
-            loss='categorical_crossentropy',
-            metrics=['categorical_accuracy'])
 
         return (True)
 

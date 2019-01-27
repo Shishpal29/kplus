@@ -56,3 +56,12 @@ class AbstractClassifier(AbstractApplication):
         self._test_dataset = ClassifierBatchGenerator()
         self._test_dataset.load_test_dataset(parameters)
         return (True)
+
+    def _setup_loss_function(self, parameters):
+        self._keras_model.compile(
+            optimizer='adam',
+            loss='categorical_crossentropy',
+            metrics=['categorical_accuracy'])
+        return (True)
+
+

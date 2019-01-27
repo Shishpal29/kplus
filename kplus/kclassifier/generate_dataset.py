@@ -27,7 +27,7 @@ from __future__ import print_function
 import sys
 import argparse
 
-from kplus.core.AbstractBatchGenerator import AbstractBatchGenerator
+from kplus.kclassifier.datasets.ClassifierBatchGenerator import ClassifierBatchGenerator
 
 
 def parse_arguments(argv):
@@ -58,7 +58,7 @@ def main(args):
         raise ValueError(
             'You must supply target root directory with --target_root_dir.')
 
-    batch_generator = AbstractBatchGenerator()
+    batch_generator = ClassifierBatchGenerator()
     status = batch_generator.generate_dataset(args.source_root_dir,
                                               args.target_root_dir)
     if (status):

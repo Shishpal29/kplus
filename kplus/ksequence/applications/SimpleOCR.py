@@ -46,6 +46,18 @@ class SimpleOCR(AbstractApplication):
         self._maximum_text_length = 9
         self._model_letters = None
 
+    def _setup_loss_function(self, parameters):
+        optimizer = Adadelta()
+
+        # Dummy lambda function for the loss
+        self._keras_model.compile(
+            loss={
+                'ctc': lambda y_true, y_pred: y_pred
+            },
+            optimizer=optimizer,
+            metrics=['accuracy'])
+        return (True)
+
     def _setup_model(self, parameters, is_training):
         model_name = parameters['model']['model_name']
         if (not (model_name in ['base', 'bidirectional', 'attention'])):
@@ -65,24 +77,17 @@ class SimpleOCR(AbstractApplication):
 
         input_shape = (self._image_width, self._image_height, 1)
         number_of_classes = len(self._model_letters) + 1
+
         self._keras_model = sequence_model.keras_model(
             input_shape, number_of_classes, self._maximum_text_length,
             is_training)
 
+        """
         try:
             self._keras_model.load_weights(parameters['test']['model_name'])
         except:
             pass
-
-        optimizer = Adadelta()
-
-        # Dummy lambda function for the loss
-        self._keras_model.compile(
-            loss={
-                'ctc': lambda y_true, y_pred: y_pred
-            },
-            optimizer=optimizer,
-            metrics=['accuracy'])
+        """
 
         return (True)
 
