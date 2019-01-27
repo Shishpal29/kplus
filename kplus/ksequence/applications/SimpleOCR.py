@@ -58,6 +58,11 @@ class SimpleOCR(AbstractApplication):
             metrics=['accuracy'])
         return (True)
 
+    def _setup_model_parameters(self, parameters, is_training):
+        model_letters = parameters['model']['letters']
+        self._model_letters = [letter for letter in model_letters]
+        return (True)
+
     def _setup_model(self, parameters, is_training):
         model_name = parameters['model']['model_name']
         if (not (model_name in ['base', 'bidirectional', 'attention'])):
@@ -117,20 +122,9 @@ class SimpleOCR(AbstractApplication):
         self._test_dataset = self._setup_dataset(dataset_dir, batch_size)
         return (True)
 
-    def _setup_datasets(self, parameters):
-        model_letters = parameters['model']['letters']
-        self._model_letters = [letter for letter in model_letters]
-
-        self._setup_train_dataset(parameters)
-        self._setup_val_dataset(parameters)
-        self._setup_test_dataset(parameters)
-
-        return (True)
-
     def _train_model(self, parameters):
         epoch = parameters['train']['max_number_of_epoch']
-        train_batch_size = parameters['train']['batch_size']
-        test_batch_size = parameters['val']['batch_size']
+
         self._keras_model.fit_generator(
             generator=self._train_dataset.next_batch(),
             steps_per_epoch=self._train_dataset.steps_per_epoch(),

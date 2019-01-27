@@ -130,12 +130,19 @@ class AbstractApplication(object):
     def _setup_loss_function(self, parameters):
         raise NotImplementedError('Must be implemented by the subclass.')
 
+    def _setup_model_parameters(self, parameters, is_training):
+        return (True)
+
     def _setup_model(self, parameters, is_training):
         raise NotImplementedError('Must be implemented by the subclass.')
 
     def train(self, parameters):
 
         status = True
+
+        status = self._setup_model_parameters(parameters, is_training=True) and status
+        if (not status):
+            return (False)
 
         status = self._setup_train_datasets(parameters) and status
         if (not status):
