@@ -138,8 +138,9 @@ class SimpleOCR(AbstractApplication):
 
         return (True)
 
-    def evaluate(self, parameters):
-        pass
+    def _evaluate_model(self, parameters):
+        return (True)
 
     def predict(self, input_image):
-        pass
+        return (True)
+

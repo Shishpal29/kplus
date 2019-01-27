@@ -167,7 +167,29 @@ class AbstractApplication(object):
         return (status)
 
     def evaluate(self, parameters):
+        status = True
+
+        status = self._setup_model_parameters(parameters, is_training=False) and status
+        if (not status):
+            return (False)
+
+        status = self._setup_test_dataset(parameters) and status
+        if (not status):
+            return (False)
+
+        status = self._setup_model(parameters, is_training=False) and status
+        if (not status):
+            return (False)
+
+        status = self._evaluate_model(parameters) and status
+        if (not status):
+            return (False)
+
+        return (status)
+
+    def _evaluate_model(self, parameters):
         raise NotImplementedError('Must be implemented by the subclass.')
 
     def predict(self, input_image):
         raise NotImplementedError('Must be implemented by the subclass.')
+

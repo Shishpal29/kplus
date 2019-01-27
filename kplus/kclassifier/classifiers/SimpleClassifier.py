@@ -66,7 +66,7 @@ class SimpleClassifier(AbstractClassifier):
 
         return (True)
 
-    def evaluate(self, parameters):
+    def _evaluate_model(self, parameters):
         return (True)
 
     def predict(self, input_image):
