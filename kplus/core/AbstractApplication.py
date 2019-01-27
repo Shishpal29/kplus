@@ -26,6 +26,7 @@ from __future__ import print_function
 
 import os
 
+from keras import backend as K
 from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard, ReduceLROnPlateau
 
 
@@ -145,6 +146,7 @@ class AbstractApplication(object):
         return (status)
 
     def train(self, parameters):
+        K.set_learning_phase(1)
 
         status = True
 
@@ -179,6 +181,8 @@ class AbstractApplication(object):
         return (status)
 
     def evaluate(self, parameters):
+        K.set_learning_phase(0)
+
         status = True
 
         status = self._setup_model_parameters(parameters, is_training=False) and status

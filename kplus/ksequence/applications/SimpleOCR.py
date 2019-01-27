@@ -26,9 +26,6 @@ from __future__ import print_function
 
 import os
 
-from keras import backend as K
-K.set_learning_phase(0)
-
 from keras.optimizers import Adadelta
 
 from kplus.ksequence.datasets.SimpleGenerator import SimpleGenerator

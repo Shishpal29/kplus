@@ -28,7 +28,6 @@ import keras
 from keras.layers import Input
 from keras.layers.core import Dense, Dropout, Flatten
 from keras.models import Model
-from keras.applications.resnet50 import ResNet50
 
 from kplus.kclassifier.classifiers.AbstractClassifier import AbstractClassifier
 
