@@ -35,9 +35,6 @@ from keras.models import Model
 
 from kplus.kclassifier.models.ModelFactory import ModelFactory
 
-K.set_learning_phase(0)
-
-
 class BaseModel(object):
 
     __name = 'base'

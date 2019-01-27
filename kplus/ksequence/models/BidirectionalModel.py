@@ -28,8 +28,6 @@ from keras import backend as K
 
 from kplus.ksequence.parameter import *
 
-K.set_learning_phase(0)
-
 from kplus.ksequence.models.BaseModel import BaseModel
 
 

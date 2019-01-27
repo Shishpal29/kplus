@@ -26,8 +26,6 @@ from __future__ import print_function
 
 from keras import backend as K
 
-K.set_learning_phase(0)
-
 from kplus.ksequence.models.BaseModel import BaseModel
 
 
