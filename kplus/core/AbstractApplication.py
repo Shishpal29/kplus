@@ -136,6 +136,14 @@ class AbstractApplication(object):
     def _setup_model(self, parameters, is_training):
         raise NotImplementedError('Must be implemented by the subclass.')
 
+    def _load_model(self, parameters):
+        status = True
+        try:
+            self._keras_model.load_weights(parameters['model']['model_name'])
+        except:
+            pass
+        return (status)
+
     def train(self, parameters):
 
         status = True
@@ -149,6 +157,10 @@ class AbstractApplication(object):
             return (False)
 
         status = self._setup_model(parameters, is_training=True) and status
+        if (not status):
+            return (False)
+
+        status = self._load_model(parameters) and status
         if (not status):
             return (False)
 

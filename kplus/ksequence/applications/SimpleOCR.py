@@ -87,13 +87,6 @@ class SimpleOCR(AbstractApplication):
             input_shape, number_of_classes, self._maximum_text_length,
             is_training)
 
-        """
-        try:
-            self._keras_model.load_weights(parameters['test']['model_name'])
-        except:
-            pass
-        """
-
         return (True)
 
     def _setup_dataset(self, dataset_dir, batch_size):

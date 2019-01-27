@@ -9,26 +9,25 @@
 		"image_width" : 128,
 		"image_height" : 64,
 		"number_of_channels" : 1,
-		"downsample_factor" : 4
+		"downsample_factor" : 4,
+		"model_name" : "/models/keras/reCAPTCHA/model.hdf5"
     },
 
     "train" : {	    
-		"train_root_dir" : "./train",
+		"train_root_dir" : "/models/keras/reCAPTCHA/",
 		"max_number_of_epoch" : 30,
-		"dataset_dir" : "./datasets/train/",
+		"dataset_dir" : "/datasets/reCAPTCHA/train/",
 		"batch_size" : 128,
 		"model_name" : "model--{epoch:03d}--{val_loss:0.5f}.hdf5"
     },
 
     "val" : {	    
-		"dataset_dir" : "./datasets/val/",
-		"batch_size" : 16,
-		"model_name" : "model--030.hdf5"    
+		"dataset_dir" : "/datasets/reCAPTCHA/val/",
+		"batch_size" : 16
     },
 
     "test" : {	    
-		"dataset_dir" : "./datasets/test/",
-		"batch_size" : 16,
-		"model_name" : "model--030.hdf5"    
+		"dataset_dir" : "/datasets/reCAPTCHA/test/",
+		"batch_size" : 16
     }
 }
