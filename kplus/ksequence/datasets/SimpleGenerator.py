@@ -47,8 +47,11 @@ class SimpleGenerator:
                                  self._image_width))
         self._texts = []
 
+    def number_of_samples(self):
+        return (self._number_of_samples)
+
     def steps_per_epoch(self):
-        return (int(self._number_of_samples / self._batch_size))
+        return (int(self.number_of_samples() / self._batch_size))
 
     def labels_to_text(self, labels):
         return ''.join(list(map(lambda x: self._letters[int(x)], labels)))

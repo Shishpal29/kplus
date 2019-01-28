@@ -140,7 +140,8 @@ class AbstractApplication(object):
     def _load_model(self, parameters):
         status = True
         try:
-            self._keras_model.load_weights(parameters['model']['model_name'])
+            self._keras_model.load_weights(
+                parameters['model']['model_filename'])
         except:
             pass
         return (status)
@@ -150,7 +151,8 @@ class AbstractApplication(object):
 
         status = True
 
-        status = self._setup_model_parameters(parameters, is_training=True) and status
+        status = self._setup_model_parameters(
+            parameters, is_training=True) and status
         if (not status):
             return (False)
 
@@ -185,7 +187,8 @@ class AbstractApplication(object):
 
         status = True
 
-        status = self._setup_model_parameters(parameters, is_training=False) and status
+        status = self._setup_model_parameters(
+            parameters, is_training=False) and status
         if (not status):
             return (False)
 
@@ -194,6 +197,14 @@ class AbstractApplication(object):
             return (False)
 
         status = self._setup_model(parameters, is_training=False) and status
+        if (not status):
+            return (False)
+
+        status = self._load_model(parameters) and status
+        if (not status):
+            return (False)
+
+        status = self._setup_loss_function(parameters) and status
         if (not status):
             return (False)
 
@@ -208,4 +219,3 @@ class AbstractApplication(object):
 
     def predict(self, input_image):
         raise NotImplementedError('Must be implemented by the subclass.')
-

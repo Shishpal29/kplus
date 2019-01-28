@@ -10,7 +10,7 @@
 		"image_height" : 64,
 		"number_of_channels" : 1,
 		"downsample_factor" : 4,
-		"model_name" : "/models/keras/reCAPTCHA/model.hdf5"
+		"model_filename" : "/models/keras/reCAPTCHA/model.hdf5"
     },
 
     "train" : {	    
@@ -18,7 +18,7 @@
 		"max_number_of_epoch" : 30,
 		"dataset_dir" : "/datasets/reCAPTCHA/train/",
 		"batch_size" : 128,
-		"model_name" : "model--{epoch:03d}--{val_loss:0.5f}.hdf5"
+		"model_filename" : "model--{epoch:03d}--{val_loss:0.5f}.hdf5"
     },
 
     "val" : {	    
