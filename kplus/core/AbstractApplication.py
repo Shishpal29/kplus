@@ -196,7 +196,7 @@ class AbstractApplication(object):
         if (not status):
             return (False)
 
-        status = self._setup_model(parameters, is_training=False) and status
+        status = self._setup_model(parameters, is_training=True) and status
         if (not status):
             return (False)
 

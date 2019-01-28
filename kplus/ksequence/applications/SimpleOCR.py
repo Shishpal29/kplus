@@ -129,6 +129,11 @@ class SimpleOCR(AbstractApplication):
         return (True)
 
     def _evaluate_model(self, parameters):
+
+        scores = self._keras_model.evaluate_generator(
+            self._test_dataset.next_batch(),
+            self._test_dataset.steps_per_epoch())
+        print(scores)
         return (True)
 
     def predict(self, input_image):
