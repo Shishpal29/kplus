@@ -130,10 +130,12 @@ class SimpleOCR(AbstractApplication):
 
     def _evaluate_model(self, parameters):
 
-        scores = self._keras_model.evaluate_generator(
+        loss, accuracy = self._keras_model.evaluate_generator(
             self._test_dataset.next_batch(),
             self._test_dataset.steps_per_epoch())
-        print(scores)
+        print('Test loss - ', str(loss))
+        print('Test accuracy -', str(accuracy))
+
         return (True)
 
     def predict(self, input_image):
