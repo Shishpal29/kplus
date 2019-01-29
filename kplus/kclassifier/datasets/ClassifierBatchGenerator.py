@@ -207,7 +207,7 @@ class ClassifierBatchGenerator(AbstractBatchGenerator):
             upper_bound = self.number_of_samples()
             lower_bound = upper_bound - self._batch_size
 
-        X = np.empty((self._batch_size, self._image_height, self._image_width,
+        X = np.empty((self._batch_size, self._image_width, self._image_height,
                       self._number_of_channels))
         y = np.empty((self._batch_size, self.number_of_classes()), dtype=int)
 
@@ -224,7 +224,8 @@ class ClassifierBatchGenerator(AbstractBatchGenerator):
             input_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2RGB)
             input_image = cv2.resize(input_image,
                                      (self._image_width, self._image_height))
-            #input_image = np.asarray(input_image, dtype='float32')
+            input_image = input_image.astype(np.float32)
+            input_image = (input_image / 255.0) * 2.0 - 1.0
 
             X[target_index] = input_image
             y[target_index] = keras.utils.np_utils.to_categorical(
