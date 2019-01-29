@@ -31,7 +31,7 @@ import numpy as np
 from kplus.datasets.AbstractBatchGenerator import AbstractBatchGenerator
 
 
-class SimpleGenerator(AbstractBatchGenerator):
+class SequenceBatchGenerator(AbstractBatchGenerator):
     def __init__(self):
         AbstractBatchGenerator.__init__(self)
 
