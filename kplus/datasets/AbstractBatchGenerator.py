@@ -55,7 +55,7 @@ class AbstractBatchGenerator(keras.utils.Sequence):
         self._random_seed = 7
 
     def number_of_samples(self):
-        return (len(self._dataset))
+        return (len(self._identifiers))
 
     def batch_size(self):
         return (self._batch_size)

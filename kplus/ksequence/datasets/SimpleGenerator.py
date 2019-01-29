@@ -28,30 +28,26 @@ import cv2
 import os, random
 import numpy as np
 
+from kplus.datasets.AbstractBatchGenerator import AbstractBatchGenerator
 
-class SimpleGenerator:
-    def __init__(self, letters, img_dirpath, img_w, img_h, batch_size,
-                 downsample_factor, max_text_len):
-        self._letters = letters
-        self._image_height = img_h
-        self._image_width = img_w
-        self._batch_size = batch_size
-        self._maximum_text_length = max_text_len
-        self._downsample_factor = downsample_factor
-        self._img_dirpath = img_dirpath  # image dir path
-        self._img_dir = os.listdir(self._img_dirpath)  # images list
-        self._number_of_samples = len(self._img_dir)  # number of images
-        self._indexes = list(range(self._number_of_samples))
-        self._current_index = 0
-        self._images = np.zeros((self._number_of_samples, self._image_height,
-                                 self._image_width))
+
+class SimpleGenerator(AbstractBatchGenerator):
+    def __init__(self):
+        AbstractBatchGenerator.__init__(self)
+
+        self._letters = ''
+
+        self._patterns = ['*.jpg', '*.jpeg', '*.png', '*.bmp']
+        self._image_width = 0
+        self._image_height = 0
+        self._number_of_channels = 0
+
+        self._maximum_text_length = 0
+        self._downsample_factor = 1.0
+
+        self._identifiers = []
+        self._images = []
         self._texts = []
-
-    def number_of_samples(self):
-        return (self._number_of_samples)
-
-    def steps_per_epoch(self):
-        return (int(self.number_of_samples() / self._batch_size))
 
     def labels_to_text(self, labels):
         return ''.join(list(map(lambda x: self._letters[int(x)], labels)))
@@ -59,57 +55,96 @@ class SimpleGenerator:
     def text_to_labels(self, text):
         return list(map(lambda x: self._letters.index(x), text))
 
-    def build_data(self):
-        print(self._number_of_samples, " Image Loading start...")
-        index = 0
-        for img_file in self._img_dir:
-            img = cv2.imread(self._img_dirpath + img_file,
-                             cv2.IMREAD_GRAYSCALE)
-            if (img is None):
+    def _load_dataset(self, dataset_dir):
+        if ((not os.path.exists(dataset_dir))
+                or (not os.path.isdir(dataset_dir))):
+            return (False)
+
+        self._identifiers = []
+        self._images = []
+        self._texts = []
+
+        image_filenames = os.listdir(dataset_dir)
+        number_of_samples = 0
+        for image_file in image_filenames:
+            image_filename = os.path.join(dataset_dir, image_file)
+            image = cv2.imread(image_filename, cv2.IMREAD_GRAYSCALE)
+            if (image is None):
                 continue
-            img = cv2.resize(img, (self._image_width, self._image_height))
-            img = img.astype(np.float32)
-            img = (img / 255.0) * 2.0 - 1.0
 
-            self._images[index, :, :] = img
-            self._texts.append(img_file[0:-4])
-            index = index + 1
-        print(len(self._texts) == self._number_of_samples)
-        print(self._number_of_samples, index, " Image Loading finish...")
+            image = cv2.resize(image, (self._image_width, self._image_height))
+            image = image.astype(np.float32)
+            image = (image / 255.0) * 2.0 - 1.0
 
-    def next_sample(self):
-        self._current_index += 1
-        if self._current_index >= self._number_of_samples:
-            self._current_index = 0
-            random.shuffle(self._indexes)
-        return self._images[self._indexes[self._current_index]], self._texts[
-            self._indexes[self._current_index]]
+            self._images.append(image.T)
+            self._texts.append(image_file[0:-4])
+            self._identifiers.append(number_of_samples)
 
-    def next_batch(self):
-        while True:
-            X_data = np.zeros(
-                [self._batch_size, self._image_width, self._image_height,
-                 1])  # (bs, 128, 64, 1)
-            Y_data = np.zeros([self._batch_size,
-                               self._maximum_text_length])  # (bs, 9)
-            input_length = np.ones((self._batch_size, 1)) * (
-                self._image_width // self._downsample_factor - 2)  # (bs, 1)
-            label_length = np.zeros((self._batch_size, 1))  # (bs, 1)
+            number_of_samples = number_of_samples + 1
 
-            for i in range(self._batch_size):
-                img, text = self.next_sample()
-                img = img.T
-                img = np.expand_dims(img, -1)
-                X_data[i] = img
-                chars = self.text_to_labels(text)
-                length = label_length[i] = len(text)
-                Y_data[i][0:length] = chars[0:length]
+        self.on_epoch_end()
 
-            inputs = {
-                'input_image': X_data,  # (bs, 128, 64, 1)
-                'input_labels': Y_data,  # (bs, 8)
-                'input_length': input_length,  # (bs, 1) -> value = 30
-                'label_length': label_length  # (bs, 1) -> value = 8
-            }
-            outputs = {'ctc': np.zeros([self._batch_size])}
-            yield (inputs, outputs)
+        return (True)
+
+    def _load_split(self, split_name, parameters):
+        dataset_dir = parameters[split_name]['dataset_dir']
+        dataset_dir = os.path.expanduser(dataset_dir)
+
+        model_letters = parameters['model']['letters']
+        self._letters = [letter for letter in model_letters]
+
+        self._image_width = parameters['model']['image_width']
+        self._image_height = parameters['model']['image_height']
+        self._number_of_channels = parameters['model']['number_of_channels']
+
+        self._batch_size = parameters[split_name]['batch_size']
+
+        self._maximum_text_length = parameters['model']['maximum_text_length']
+        self._downsample_factor = parameters['model']['downsample_factor']
+
+        #print(model_letters, self._image_width, self._image_height, self._number_of_channels, self._batch_size, self._maximum_text_length, self._downsample_factor)
+        return (self._load_dataset(dataset_dir))
+
+    def __getitem__(self, batch_index):
+
+        lower_bound = batch_index * self._batch_size
+        upper_bound = (batch_index + 1) * self._batch_size
+
+        if (upper_bound > self.number_of_samples()):
+            upper_bound = self.number_of_samples()
+            lower_bound = upper_bound - self._batch_size
+
+        X_data = np.zeros((self._batch_size, self._image_width,
+                           self._image_height, self._number_of_channels))
+        Y_data = np.zeros((self._batch_size, self._maximum_text_length))
+
+        input_length = np.ones((self._batch_size, 1)) * (
+            self._image_width // self._downsample_factor - 2)  # (bs, 1)
+        label_length = np.zeros((self._batch_size, 1))  # (bs, 1)
+
+        for index in range(lower_bound, upper_bound):
+            target_index = index - lower_bound
+            source_identifier = self._identifiers[index]
+
+            input_image = self._images[self._identifiers[source_identifier]]
+            input_image = input_image
+            input_image = np.expand_dims(input_image, -1)
+
+            text = self._texts[self._identifiers[source_identifier]]
+
+            characters = self.text_to_labels(text)
+            length = label_length[target_index] = len(text)
+
+            X_data[target_index] = input_image
+            Y_data[target_index][0:length] = characters[0:length]
+
+        inputs = {
+            'input_image': X_data,  # (bs, 128, 64, 1)
+            'input_labels': Y_data,  # (bs, 8)
+            'input_length': input_length,  # (bs, 1) -> value = 30
+            'label_length': label_length  # (bs, 1) -> value = 8
+        }
+
+        outputs = {'ctc': np.zeros([self._batch_size])}
+
+        return (inputs, outputs)
