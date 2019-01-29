@@ -207,7 +207,7 @@ class ClassifierBatchGenerator(AbstractBatchGenerator):
             upper_bound = self.number_of_samples()
             lower_bound = upper_bound - self._batch_size
 
-        X = np.empty((self._batch_size, self._image_width, self._image_height,
+        X = np.empty((self._batch_size, self._image_height, self._image_width,
                       self._number_of_channels))
         y = np.empty((self._batch_size, self.number_of_classes()), dtype=int)
 
