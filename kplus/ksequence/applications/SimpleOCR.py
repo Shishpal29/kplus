@@ -101,21 +101,5 @@ class SimpleOCR(AbstractApplication):
         self._test_dataset.load_test_dataset(parameters)
         return (True)
 
-    def _train_model(self, parameters):
-        epoch = parameters['train']['max_number_of_epoch']
-
-        self._keras_model.fit_generator(
-            generator=self._train_dataset,
-            steps_per_epoch=self._train_dataset.steps_per_epoch(),
-            callbacks=[
-                self._checkpoint, self._early_stop, self._change_learning_rate,
-                self._tensorboard
-            ],
-            epochs=epoch,
-            validation_data=self._val_dataset,
-            validation_steps=self._val_dataset.steps_per_epoch())
-
-        return (True)
-
     def predict(self, input_image):
         return (True)

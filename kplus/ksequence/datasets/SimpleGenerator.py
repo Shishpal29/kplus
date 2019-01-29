@@ -102,7 +102,6 @@ class SimpleGenerator(AbstractBatchGenerator):
         self._maximum_text_length = parameters['model']['maximum_text_length']
         self._downsample_factor = parameters['model']['downsample_factor']
 
-        #print(model_letters, self._image_width, self._image_height, self._number_of_channels, self._batch_size, self._maximum_text_length, self._downsample_factor)
         return (self._load_dataset(dataset_dir))
 
     def __getitem__(self, batch_index):
