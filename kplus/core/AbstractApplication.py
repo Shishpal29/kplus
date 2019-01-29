@@ -89,7 +89,7 @@ class AbstractApplication(object):
         train_root_dir = os.path.expanduser(
             parameters['train']['train_root_dir'])
         checkpoint_path = os.path.join(train_root_dir,
-                                       parameters['train']['model_name'])
+                                       parameters['train']['model_filename'])
         tensorboard_path = os.path.join(train_root_dir, 'tensorboard')
 
         status = True
