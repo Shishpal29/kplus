@@ -86,20 +86,8 @@ class SimpleOCR(AbstractApplication):
 
         return (True)
 
-    def _setup_train_dataset(self, parameters):
-        self._train_dataset = SequenceBatchGenerator()
-        self._train_dataset.load_train_dataset(parameters)
-        return (True)
-
-    def _setup_val_dataset(self, parameters):
-        self._val_dataset = SequenceBatchGenerator()
-        self._val_dataset.load_val_dataset(parameters)
-        return (True)
-
-    def _setup_test_dataset(self, parameters):
-        self._test_dataset = SequenceBatchGenerator()
-        self._test_dataset.load_test_dataset(parameters)
-        return (True)
+    def _batch_generator(self):
+        return (SequenceBatchGenerator())
 
     def predict(self, input_image):
         return (True)

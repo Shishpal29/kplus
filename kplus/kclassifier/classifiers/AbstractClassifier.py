@@ -42,20 +42,8 @@ class AbstractClassifier(AbstractApplication):
     def use_feature_extractor(self, feature_extractor):
         self._feature_extractor = ModelFactory.simple_model(feature_extractor)
 
-    def _setup_train_dataset(self, parameters):
-        self._train_dataset = ClassifierBatchGenerator()
-        self._train_dataset.load_train_dataset(parameters)
-        return (True)
-
-    def _setup_val_dataset(self, parameters):
-        self._val_dataset = ClassifierBatchGenerator()
-        self._val_dataset.load_val_dataset(parameters)
-        return (True)
-
-    def _setup_test_dataset(self, parameters):
-        self._test_dataset = ClassifierBatchGenerator()
-        self._test_dataset.load_test_dataset(parameters)
-        return (True)
+    def _batch_generator(self):
+        return (ClassifierBatchGenerator())
 
     def _setup_loss_function(self, parameters):
         self._keras_model.compile(
@@ -63,5 +51,3 @@ class AbstractClassifier(AbstractApplication):
             loss='categorical_crossentropy',
             metrics=['categorical_accuracy'])
         return (True)
-
-

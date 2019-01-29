@@ -114,14 +114,23 @@ class AbstractApplication(object):
 
         return (True)
 
+    def _batch_generator(self):
+        raise NotImplementedError('Must be implemented by the subclass.')
+
     def _setup_train_dataset(self, parameters):
-        return (False)
+        self._train_dataset = self._batch_generator()
+        self._train_dataset.load_train_dataset(parameters)
+        return (True)
 
     def _setup_val_dataset(self, parameters):
-        return (False)
+        self._val_dataset = self._batch_generator()
+        self._val_dataset.load_val_dataset(parameters)
+        return (True)
 
     def _setup_test_dataset(self, parameters):
-        return (False)
+        self._test_dataset = self._batch_generator()
+        self._test_dataset.load_test_dataset(parameters)
+        return (True)
 
     def _setup_train_datasets(self, parameters):
         self._setup_train_dataset(parameters)
@@ -140,8 +149,7 @@ class AbstractApplication(object):
     def _load_model(self, parameters):
         status = True
         try:
-            self._keras_model.load_weights(
-                parameters['model']['model_filename'])
+            self.load_weights(parameters['model']['model_filename'])
         except:
             pass
         return (status)
