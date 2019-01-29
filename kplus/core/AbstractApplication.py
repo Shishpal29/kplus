@@ -215,7 +215,13 @@ class AbstractApplication(object):
         return (status)
 
     def _evaluate_model(self, parameters):
-        raise NotImplementedError('Must be implemented by the subclass.')
+
+        loss, accuracy = self._keras_model.evaluate_generator(
+            self._test_dataset, self._test_dataset.steps_per_epoch())
+        print('Test loss - ', str(loss))
+        print('Test accuracy -', str(accuracy))
+
+        return (True)
 
     def predict(self, input_image):
         raise NotImplementedError('Must be implemented by the subclass.')
