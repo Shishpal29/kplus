@@ -39,7 +39,7 @@ class ResNet50Model(AbstractModel):
         return (ResNet50Model.__name)
 
     def __init__(self):
-        pass
+        AbstractModel.__init__(self)
 
     def build(self, input_shape):
         resnet50 = ResNet50(

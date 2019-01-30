@@ -25,6 +25,7 @@ from __future__ import division
 from __future__ import print_function
 
 from keras import backend as K
+
 from keras.layers import Conv2D, MaxPooling2D
 from keras.layers import Input, Dense, Activation
 from keras.layers import Reshape, Lambda, BatchNormalization
@@ -42,7 +43,7 @@ class SimpleVGGModel(AbstractModel):
         return (SimpleVGGModel.__name)
 
     def __init__(self):
-        pass
+        AbstractModel.__init__(self)
 
     def build(self, input_shape):
 
