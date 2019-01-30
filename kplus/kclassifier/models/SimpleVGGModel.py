@@ -132,7 +132,3 @@ class SimpleVGGModel(AbstractModel):
         simple_vgg_output = Activation('relu')(inner)
 
         self.feature_extractor = Model(simple_vgg_input, simple_vgg_output)
-
-    def normalize(self, input_image):
-        normalized_image = input_image
-        return (normalized_image)

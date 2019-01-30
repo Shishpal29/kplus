@@ -73,11 +73,14 @@ class SimpleOCR(AbstractApplication):
         sequence_model.use_feature_extractor(feature_extractor)
 
         self._maximum_text_length = parameters['model']['maximum_text_length']
-        self._image_width = parameters['model']['image_width']
-        self._image_height = parameters['model']['image_height']
         self._downsample_factor = parameters['model']['downsample_factor']
 
-        input_shape = (self._image_width, self._image_height, 1)
+        self._image_width = parameters['model']['image_width']
+        self._image_height = parameters['model']['image_height']
+        self._number_of_channels = parameters['model']['number_of_channels']
+
+        input_shape = (self._image_width, self._image_height,
+                       self._number_of_channels)
         number_of_classes = len(self._model_letters) + 1
 
         self._keras_model = sequence_model.keras_model(

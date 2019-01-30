@@ -43,21 +43,9 @@ class ResNet50Model(AbstractModel):
 
     def build(self, input_shape):
         resnet50 = ResNet50(
-            input_shape=(input_shape[0], input_shape[1], 3),
-            weights=None,
-            include_top=False)
+            input_shape=input_shape, weights=None, include_top=False)
 
         # Remove the average pooling layer.
         resnet50.layers.pop()
         self.feature_extractor = Model(resnet50.layers[0].input,
                                        resnet50.layers[-1].output)
-
-    def normalize(self, input_image):
-        normalized_image = input_image[..., ::-1]
-        normalized_image = normalized_image.astype('float')
-
-        normalized_image[..., 0] -= 103.939
-        normalized_image[..., 1] -= 116.779
-        normalized_image[..., 2] -= 123.68
-
-        return (normalized_image)

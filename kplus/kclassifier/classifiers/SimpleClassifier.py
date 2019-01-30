@@ -47,7 +47,7 @@ class SimpleClassifier(AbstractClassifier):
         self._image_height = parameters['model']['image_height']
         self._number_of_channels = parameters['model']['number_of_channels']
 
-        input_shape = (self._image_width, self._image_height,
+        input_shape = (self._image_height, self._image_width,
                        self._number_of_channels)
         input_layer = Input(
             name='input_layer', shape=input_shape, dtype='float32')
