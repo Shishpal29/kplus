@@ -32,9 +32,10 @@ import keras
 import cv2
 
 from kplus.datasets.AbstractBatchGenerator import AbstractBatchGenerator
+from kplus.datasets.ImageBatchGenerator import ImageBatchGenerator
 
 
-class ClassifierBatchGenerator(AbstractBatchGenerator):
+class ClassifierBatchGenerator(ImageBatchGenerator):
 
     _minimum_images = 1
 
@@ -47,7 +48,7 @@ class ClassifierBatchGenerator(AbstractBatchGenerator):
         return ('label')
 
     def __init__(self):
-        AbstractBatchGenerator.__init__(self)
+        ImageBatchGenerator.__init__(self)
 
         self._labels_filename = 'labels.txt'
 
@@ -55,11 +56,6 @@ class ClassifierBatchGenerator(AbstractBatchGenerator):
         self._class_names_to_labels = None
 
         self._number_of_classes = 0
-
-        self._patterns = ["*.jpg", "*.jpeg", "*.png", "*.bmp"]
-        self._image_width = 0
-        self._image_height = 0
-        self._number_of_channels = 0
 
     def labels_filename(self):
         return (self._labels_filename)
@@ -221,11 +217,8 @@ class ClassifierBatchGenerator(AbstractBatchGenerator):
                                                      label_tag()]
 
             input_image = cv2.imread(filename, cv2.IMREAD_COLOR)
-            input_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2RGB)
-            input_image = cv2.resize(input_image,
-                                     (self._image_width, self._image_height))
-            input_image = input_image.astype(np.float32)
-            input_image = (input_image / 255.0) * 2.0 - 1.0
+            input_image = self._image_to_array(input_image)
+            input_image = self._normalize(input_image)
 
             X[target_index] = input_image
             y[target_index] = keras.utils.np_utils.to_categorical(

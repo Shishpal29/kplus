@@ -29,18 +29,14 @@ import os, random
 import numpy as np
 
 from kplus.datasets.AbstractBatchGenerator import AbstractBatchGenerator
+from kplus.datasets.ImageBatchGenerator import ImageBatchGenerator
 
 
-class SequenceBatchGenerator(AbstractBatchGenerator):
+class SequenceBatchGenerator(ImageBatchGenerator):
     def __init__(self):
-        AbstractBatchGenerator.__init__(self)
+        ImageBatchGenerator.__init__(self)
 
         self._letters = ''
-
-        self._patterns = ['*.jpg', '*.jpeg', '*.png', '*.bmp']
-        self._image_width = 0
-        self._image_height = 0
-        self._number_of_channels = 0
 
         self._maximum_text_length = 0
         self._downsample_factor = 1.0
@@ -72,9 +68,8 @@ class SequenceBatchGenerator(AbstractBatchGenerator):
             if (image is None):
                 continue
 
-            image = cv2.resize(image, (self._image_width, self._image_height))
-            image = image.astype(np.float32)
-            image = (image / 255.0) * 2.0 - 1.0
+            image = self._image_to_array(image)
+            image = self._normalize(image)
 
             self._images.append(image.T)
             self._texts.append(image_file[0:-4])
