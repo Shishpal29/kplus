@@ -49,40 +49,40 @@ class SimpleVGGModel(AbstractModel):
 
         simple_vgg_input = Input(
             name='simple_vgg_input', shape=input_shape,
-            dtype='float32')  # (None, 128, 64, 1)
+            dtype='float32')  # (None, 64, 128, 1)
 
         inner = Conv2D(
             64, (3, 3),
             padding='same',
             name='conv1',
             kernel_initializer='he_normal')(
-                simple_vgg_input)  # (None, 128, 64, 64)
+                simple_vgg_input)  # (None, 64, 128, 64)
 
         inner = BatchNormalization()(inner)
 
         inner = Activation('relu')(inner)
 
         inner = MaxPooling2D(
-            pool_size=(2, 2), name='max1')(inner)  # (None,64, 32, 64)
+            pool_size=(2, 2), name='max1')(inner)  # (None, 32, 64, 64)
 
         inner = Conv2D(
             128, (3, 3),
             padding='same',
             name='conv2',
-            kernel_initializer='he_normal')(inner)  # (None, 64, 32, 128)
+            kernel_initializer='he_normal')(inner)  # (None, 32, 64, 128)
 
         inner = BatchNormalization()(inner)
 
         inner = Activation('relu')(inner)
 
         inner = MaxPooling2D(
-            pool_size=(2, 2), name='max2')(inner)  # (None, 32, 16, 128)
+            pool_size=(2, 2), name='max2')(inner)  # (None, 16, 32, 128)
 
         inner = Conv2D(
             256, (3, 3),
             padding='same',
             name='conv3',
-            kernel_initializer='he_normal')(inner)  # (None, 32, 16, 256)
+            kernel_initializer='he_normal')(inner)  # (None, 16, 32, 256)
 
         inner = BatchNormalization()(inner)
 
@@ -92,20 +92,20 @@ class SimpleVGGModel(AbstractModel):
             256, (3, 3),
             padding='same',
             name='conv4',
-            kernel_initializer='he_normal')(inner)  # (None, 32, 16, 256)
+            kernel_initializer='he_normal')(inner)  # (None, 16, 32, 256)
 
         inner = BatchNormalization()(inner)
 
         inner = Activation('relu')(inner)
 
         inner = MaxPooling2D(
-            pool_size=(1, 2), name='max3')(inner)  # (None, 32, 8, 256)
+            pool_size=(2, 1), name='max3')(inner)  # (None, 8, 32, 256)
 
         inner = Conv2D(
             512, (3, 3),
             padding='same',
             name='conv5',
-            kernel_initializer='he_normal')(inner)  # (None, 32, 8, 512)
+            kernel_initializer='he_normal')(inner)  # (None, 8, 32, 512)
 
         inner = BatchNormalization()(inner)
 
@@ -113,20 +113,20 @@ class SimpleVGGModel(AbstractModel):
 
         inner = Conv2D(
             512, (3, 3), padding='same',
-            name='conv6')(inner)  # (None, 32, 8, 512)
+            name='conv6')(inner)  # (None, 8, 32, 512)
 
         inner = BatchNormalization()(inner)
 
         inner = Activation('relu')(inner)
 
         inner = MaxPooling2D(
-            pool_size=(1, 2), name='max4')(inner)  # (None, 32, 4, 512)
+            pool_size=(2, 1), name='max4')(inner)  # (None, 4, 32, 512)
 
         inner = Conv2D(
             512, (2, 2),
             padding='same',
             kernel_initializer='he_normal',
-            name='con7')(inner)  # (None, 32, 4, 512)
+            name='con7')(inner)  # (None, 4, 32, 512)
 
         inner = BatchNormalization()(inner)
 

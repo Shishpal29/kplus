@@ -35,6 +35,7 @@ from keras.models import Model
 
 from kplus.kclassifier.models.ModelFactory import ModelFactory
 
+
 class BaseModel(object):
 
     __name = 'base'
@@ -111,7 +112,7 @@ class BaseModel(object):
 
         input_image = Input(
             name='input_image', shape=input_shape,
-            dtype='float32')  # (None, 128, 64, 1)
+            dtype='float32')  # (None, 64, 128, 1)
 
         self._feature_extractor.build(input_shape=input_shape)
         features = self._feature_extractor.extract_features(input_image)

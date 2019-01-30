@@ -58,14 +58,16 @@ class ImageBatchGenerator(AbstractBatchGenerator):
 
         opencv_image = cv2.resize(opencv_image,
                                   (self._image_width, self._image_height))
-        opencv_image = cv2.cvtColor(opencv_image, cv2.COLOR_BGR2RGB)
+
+        if (len(opencv_image.shape) == 3):
+            opencv_image = cv2.cvtColor(opencv_image, cv2.COLOR_BGR2RGB)
 
         numpy_array = np.asarray(opencv_image, dtype=K.floatx())
 
         if (len(numpy_array.shape) == 3):
             if (data_format == 'channels_first'):
                 numpy_array = numpy_array.transpose(2, 0, 1)
-        elif (len(x.shape) == 2):
+        elif (len(numpy_array.shape) == 2):
             if (data_format == 'channels_first'):
                 numpy_array = numpy_array.reshape((1, numpy_array.shape[0],
                                                    numpy_array.shape[1]))
@@ -74,9 +76,9 @@ class ImageBatchGenerator(AbstractBatchGenerator):
                                                    numpy_array.shape[1], 1))
         else:
             raise ValueError('Unsupported image shape - ', numpy_array.shape)
+
         return (numpy_array)
 
     def _normalize(self, input_image):
-        input_image = input_image.astype(np.float32)
         input_image = (input_image / 255.0) * 2.0 - 1.0
         return (input_image)

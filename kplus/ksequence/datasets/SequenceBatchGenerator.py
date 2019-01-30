@@ -46,10 +46,10 @@ class SequenceBatchGenerator(ImageBatchGenerator):
         self._texts = []
 
     def labels_to_text(self, labels):
-        return ''.join(list(map(lambda x: self._letters[int(x)], labels)))
+        return (''.join(list(map(lambda x: self._letters[int(x)], labels))))
 
     def text_to_labels(self, text):
-        return list(map(lambda x: self._letters.index(x), text))
+        return (list(map(lambda x: self._letters.index(x), text)))
 
     def _load_dataset(self, dataset_dir):
         if ((not os.path.exists(dataset_dir))
@@ -71,7 +71,7 @@ class SequenceBatchGenerator(ImageBatchGenerator):
             image = self._image_to_array(image)
             image = self._normalize(image)
 
-            self._images.append(image.T)
+            self._images.append(image)
             self._texts.append(image_file[0:-4])
             self._identifiers.append(number_of_samples)
 
@@ -108,22 +108,20 @@ class SequenceBatchGenerator(ImageBatchGenerator):
             upper_bound = self.number_of_samples()
             lower_bound = upper_bound - self._batch_size
 
-        X_data = np.zeros((self._batch_size, self._image_width,
-                           self._image_height, self._number_of_channels))
+        X_data = np.zeros((self._batch_size, self._image_height,
+                           self._image_width, self._number_of_channels))
         Y_data = np.zeros((self._batch_size, self._maximum_text_length))
 
         input_length = np.ones((self._batch_size, 1)) * (
-            self._image_width // self._downsample_factor - 2)  # (bs, 1)
-        label_length = np.zeros((self._batch_size, 1))  # (bs, 1)
+            self._image_width // self._downsample_factor - 2
+        )  # (batch_size, 1)
+        label_length = np.zeros((self._batch_size, 1))  # (batch_size, 1)
 
         for index in range(lower_bound, upper_bound):
             target_index = index - lower_bound
             source_identifier = self._identifiers[index]
 
             input_image = self._images[self._identifiers[source_identifier]]
-            input_image = input_image
-            input_image = np.expand_dims(input_image, -1)
-
             text = self._texts[self._identifiers[source_identifier]]
 
             characters = self.text_to_labels(text)
@@ -133,10 +131,10 @@ class SequenceBatchGenerator(ImageBatchGenerator):
             Y_data[target_index][0:length] = characters[0:length]
 
         inputs = {
-            'input_image': X_data,  # (bs, 128, 64, 1)
-            'input_labels': Y_data,  # (bs, 8)
-            'input_length': input_length,  # (bs, 1) -> value = 30
-            'label_length': label_length  # (bs, 1) -> value = 8
+            'input_image': X_data,  # (batch_size, 64, 128, 1)
+            'input_labels': Y_data,  # (batch_size, 8)
+            'input_length': input_length,  # (batch_size, 1) -> value = 30
+            'label_length': label_length  # (batch_size, 1) -> value = 8
         }
 
         outputs = {'ctc': np.zeros([self._batch_size])}
