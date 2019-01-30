@@ -32,6 +32,7 @@ from keras.layers.merge import add, concatenate
 from keras.layers.recurrent import LSTM
 
 from keras.models import Model
+from keras import regularizers
 
 from kplus.kclassifier.models.ModelFactory import ModelFactory
 
@@ -126,6 +127,7 @@ class BaseModel(object):
             64,
             activation='relu',
             kernel_initializer='he_normal',
+            kernel_regularizer=regularizers.l2(0.00004),
             name='dense1')(inner)  # (None, 32, 64)
 
         encoded_sequence = self._encode_sequence(inner)
