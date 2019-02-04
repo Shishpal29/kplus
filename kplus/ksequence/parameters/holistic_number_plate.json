@@ -1,6 +1,6 @@
 {
     "model" : {
-		"letters" : " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+		"letters" : "0123456789ABCDEFGHIJKLMNPQRSTUVWXYZ",
 		"model_name" : "bidirectional",
 		"feature_extractor" : "simple_vgg",
 		"maximum_text_length" : 9,
@@ -9,24 +9,24 @@
 		"number_of_channels" : 1,
 		"downsample_factor" : 4,
 		"base_learning_rate" : 0.001,
-		"model_filename" : "/models/keras/reCAPTCHA/model.hdf5"
+		"model_filename" : "/models/keras/holistic_number_plate/model.hdf5"
     },
 
     "train" : {	    
-		"train_root_dir" : "/models/keras/reCAPTCHA/",
+		"train_root_dir" : "/models/keras/holistic_number_plate/",
 		"max_number_of_epoch" : 30,
-		"dataset_dir" : "/datasets/reCAPTCHA/train/",
+		"dataset_dir" : "/datasets/holistic_number_plate/train/",
 		"batch_size" : 128,
 		"model_filename" : "model--{epoch:03d}--{val_loss:0.5f}.hdf5"
     },
 
     "val" : {	    
-		"dataset_dir" : "/datasets/reCAPTCHA/val/",
+		"dataset_dir" : "/datasets/holistic_number_plate/val/",
 		"batch_size" : 16
     },
 
     "test" : {	    
-		"dataset_dir" : "/datasets/reCAPTCHA/test/",
+		"dataset_dir" : "/datasets/holistic_number_plate/test/",
 		"batch_size" : 16
     }
 }

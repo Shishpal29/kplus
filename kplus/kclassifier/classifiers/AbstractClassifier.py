@@ -24,6 +24,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from keras.optimizers import Adam
+
 from kplus.core.AbstractApplication import AbstractApplication
 
 from kplus.kclassifier.datasets.ClassifierBatchGenerator import ClassifierBatchGenerator
@@ -46,8 +48,12 @@ class AbstractClassifier(AbstractApplication):
         return (ClassifierBatchGenerator())
 
     def _setup_loss_function(self, parameters):
+
+        base_learning_rate = parameters['model']['base_learning_rate']
+        optimizer = Adam(lr=base_learning_rate)
+
         self._keras_model.compile(
-            optimizer='adam',
+            optimizer=optimizer,
             loss='categorical_crossentropy',
             metrics=['categorical_accuracy'])
         return (True)
