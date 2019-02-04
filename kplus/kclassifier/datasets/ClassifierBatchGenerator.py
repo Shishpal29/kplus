@@ -194,6 +194,9 @@ class ClassifierBatchGenerator(ImageBatchGenerator):
 
         return (self._load_dataset(dataset_dir))
 
+    def _augment_image(self, input_image):
+        return (input_image)
+
     def __getitem__(self, batch_index):
 
         lower_bound = batch_index * self._batch_size
@@ -219,6 +222,7 @@ class ClassifierBatchGenerator(ImageBatchGenerator):
             input_image = cv2.imread(filename, cv2.IMREAD_COLOR)
             input_image = self._image_to_array(input_image)
             input_image = self._normalize(input_image)
+            input_image = self._augment(input_image)
 
             X[target_index] = input_image
             y[target_index] = keras.utils.np_utils.to_categorical(

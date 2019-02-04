@@ -99,7 +99,7 @@ class SequenceBatchGenerator(ImageBatchGenerator):
 
         return (self._load_dataset(dataset_dir))
 
-    def _augment(self, input_image):
+    def _augment_image(self, input_image):
         augmented_image = cv2.GaussianBlur(input_image, (3, 3), 0)
         return (augmented_image)
 
@@ -126,7 +126,7 @@ class SequenceBatchGenerator(ImageBatchGenerator):
             source_identifier = self._identifiers[index]
 
             input_image = self._images[self._identifiers[source_identifier]]
-            input_image = self.augment(input_image)
+            input_image = self._augment(input_image)
 
             text = self._texts[self._identifiers[source_identifier]]
 
