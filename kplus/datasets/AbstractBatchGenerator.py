@@ -57,8 +57,9 @@ class AbstractBatchGenerator(keras.utils.Sequence):
         self._random_seed = 7
         random.seed(self._random_seed)
 
-    def use_augmentation(self):
-        return (self._use_augmentation)
+    def use_augmentation(self, threshold=50.0):
+        return ((self._use_augmentation)
+                and (random.randint(0, 100) > threshold))
 
     def number_of_samples(self):
         return (len(self._identifiers))
