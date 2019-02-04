@@ -80,8 +80,8 @@ class ImageBatchGenerator(AbstractBatchGenerator):
         return (numpy_array)
 
     def _normalize(self, input_image):
-        #input_image = input_image[:,:,::-1]
-        input_image = np.expand_dims(input_image, -1)
+        if (len(input_image.shape) == 2):
+            input_image = np.expand_dims(input_image, -1)
         input_image = (input_image / 255.0) * 2.0 - 1.0
         return (input_image)
 
