@@ -55,6 +55,7 @@ class AbstractBatchGenerator(keras.utils.Sequence):
         self._shuffle = True
 
         self._random_seed = 7
+        random.seed(self._random_seed)
 
     def use_augmentation(self):
         return (self._use_augmentation)

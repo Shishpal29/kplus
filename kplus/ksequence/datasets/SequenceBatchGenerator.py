@@ -25,7 +25,7 @@ from __future__ import division
 from __future__ import print_function
 
 import cv2
-import os, random
+import os
 import numpy as np
 
 from kplus.datasets.AbstractBatchGenerator import AbstractBatchGenerator

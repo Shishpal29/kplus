@@ -71,7 +71,6 @@ class ClassifierBatchGenerator(ImageBatchGenerator):
             if (os.path.isdir(class_path)):
                 class_names.append(class_name)
 
-        random.seed(self._random_seed)
         random.shuffle(class_names)
 
         labels_to_class_names = dict(zip(range(len(class_names)), class_names))
