@@ -82,3 +82,12 @@ class ImageBatchGenerator(AbstractBatchGenerator):
     def _normalize(self, input_image):
         input_image = (input_image / 255.0) * 2.0 - 1.0
         return (input_image)
+
+    def _augment(self, input_image):
+        return (input_image)
+
+    def augment(self, input_image):
+        augmented_image = input_image
+        if (self.use_augmentation()):
+            augmented_image = self._augment(input_image)
+        return (augmented_image)

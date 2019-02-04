@@ -46,6 +46,8 @@ class AbstractBatchGenerator(keras.utils.Sequence):
 
     def __init__(self):
 
+        self._use_augmentation = False
+
         self._dataset = []
         self._identifiers = []
 
@@ -53,6 +55,9 @@ class AbstractBatchGenerator(keras.utils.Sequence):
         self._shuffle = True
 
         self._random_seed = 7
+
+    def use_augmentation(self):
+        return (self._use_augmentation)
 
     def number_of_samples(self):
         return (len(self._identifiers))
@@ -74,14 +79,17 @@ class AbstractBatchGenerator(keras.utils.Sequence):
         raise NotImplementedError('Must be implemented by the subclass.')
 
     def load_train_dataset(self, parameters):
+        self._use_augmentation = True
         split_name = AbstractBatchGenerator.train_split_name()
         return (self._load_split(split_name, parameters))
 
     def load_val_dataset(self, parameters):
+        self._use_augmentation = False
         split_name = AbstractBatchGenerator.val_split_name()
         return (self._load_split(split_name, parameters))
 
     def load_test_dataset(self, parameters):
+        self._use_augmentation = False
         split_name = AbstractBatchGenerator.test_split_name()
         return (self._load_split(split_name, parameters))
 
