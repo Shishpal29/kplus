@@ -32,9 +32,6 @@ class AbstractModel(object):
     def build(self, input_shape):
         raise NotImplementedError('Must be implemented by the subclass.')
 
-    def normalize(self, input_image):
-        raise NotImplementedError('Must be implemented by the subclass.')
-
     def get_output_shape(self):
         return (self.feature_extractor.get_output_shape_at(-1)[1:3])
 
