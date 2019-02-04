@@ -221,8 +221,8 @@ class ClassifierBatchGenerator(ImageBatchGenerator):
 
             input_image = cv2.imread(filename, cv2.IMREAD_COLOR)
             input_image = self._image_to_array(input_image)
-            input_image = self._normalize(input_image)
             input_image = self._augment(input_image)
+            input_image = self._normalize(input_image)
 
             X[target_index] = input_image
             y[target_index] = keras.utils.np_utils.to_categorical(

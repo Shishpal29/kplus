@@ -69,10 +69,10 @@ class SequenceBatchGenerator(ImageBatchGenerator):
                 continue
 
             image = self._image_to_array(image)
-            image = self._normalize(image)
-
             self._images.append(image)
+
             self._texts.append(image_file[0:-4])
+
             self._identifiers.append(number_of_samples)
 
             number_of_samples = number_of_samples + 1
@@ -127,6 +127,7 @@ class SequenceBatchGenerator(ImageBatchGenerator):
 
             input_image = self._images[self._identifiers[source_identifier]]
             input_image = self._augment(input_image)
+            input_image = self._normalize(input_image)
 
             text = self._texts[self._identifiers[source_identifier]]
 
