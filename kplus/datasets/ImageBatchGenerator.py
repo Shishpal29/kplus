@@ -26,6 +26,7 @@ from __future__ import print_function
 
 from keras import backend as K
 
+import random
 import numpy as np
 import cv2
 
@@ -33,6 +34,9 @@ from kplus.datasets.AbstractBatchGenerator import AbstractBatchGenerator
 
 
 class ImageBatchGenerator(AbstractBatchGenerator):
+
+    __default_threshold = 50.0
+
     def __init__(self):
         AbstractBatchGenerator.__init__(self)
 
@@ -80,16 +84,18 @@ class ImageBatchGenerator(AbstractBatchGenerator):
         return (numpy_array)
 
     def _normalize(self, input_image):
-        if (len(input_image.shape) == 2):
-            input_image = np.expand_dims(input_image, -1)
         input_image = (input_image / 255.0) * 2.0 - 1.0
         return (input_image)
 
-    def _augment_image(self, input_image):
+    def _augment_image(self,
+                       input_image,
+                       threshold=ImageBatchGenerator.__default_threshold):
         return (input_image)
 
-    def _augment(self, input_image):
+    def _augment(self,
+                 input_image,
+                 threshold=ImageBatchGenerator.__default_threshold):
         augmented_image = input_image
-        if (self.use_augmentation()):
-            augmented_image = self._augment_image(input_image)
+        if (self.use_augmentation() and (random.randint(0, 100) > threshold)):
+            augmented_image = self._augment_image(input_image, threshold)
         return (augmented_image)

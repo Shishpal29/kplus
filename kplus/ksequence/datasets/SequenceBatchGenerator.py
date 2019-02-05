@@ -100,8 +100,7 @@ class SequenceBatchGenerator(ImageBatchGenerator):
         return (self._load_dataset(dataset_dir))
 
     def _augment_image(self, input_image):
-        augmented_image = cv2.GaussianBlur(input_image, (3, 3), 0)
-        return (augmented_image)
+        return (input_image)
 
     def __getitem__(self, batch_index):
 
