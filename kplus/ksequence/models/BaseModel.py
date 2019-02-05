@@ -27,6 +27,7 @@ from __future__ import print_function
 from keras import backend as K
 
 from keras.layers import Conv2D
+from keras.layers import Conv1D
 from keras.layers import Input, Dense, Activation
 from keras.layers import Reshape, Lambda, BatchNormalization
 from keras.layers import Dropout
@@ -141,7 +142,6 @@ class BaseModel(object):
         inner = Dense(
             number_of_classes, kernel_initializer='he_normal',
             name='dense2')(decoded_sequence)  #(None, 32, 42)
-        #inner = Conv2D(number_of_classes, (1, 1), name='conv2d-dense2', kernel_initializer='he_normal')(inner)  #(None, 32, 42)
 
         predicted_output = Activation('softmax', name='softmax')(inner)
 
