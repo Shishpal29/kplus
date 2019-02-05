@@ -26,7 +26,6 @@ from __future__ import print_function
 
 import os
 
-from keras.optimizers import Adadelta
 from keras.optimizers import Adam
 
 from kplus.ksequence.datasets.SequenceBatchGenerator import SequenceBatchGenerator
@@ -45,8 +44,6 @@ class SimpleOCR(AbstractApplication):
         self._model_letters = None
 
     def _setup_loss_function(self, parameters):
-        #optimizer = Adadelta()
-
         base_learning_rate = parameters['model']['base_learning_rate']
         optimizer = Adam(lr=base_learning_rate)
 
@@ -96,6 +93,8 @@ class SimpleOCR(AbstractApplication):
         self._keras_model = sequence_model.keras_model(
             input_shape, number_of_classes, self._maximum_text_length,
             is_training)
+
+        self._keras_model.summary()
 
         return (True)
 
