@@ -94,6 +94,8 @@ class SimpleOCR(AbstractApplication):
             input_shape, number_of_classes, self._maximum_text_length,
             is_training)
 
+        self._keras_model.summary()
+
         return (True)
 
     def _batch_generator(self):

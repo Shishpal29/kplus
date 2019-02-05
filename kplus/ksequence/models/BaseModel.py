@@ -26,6 +26,7 @@ from __future__ import print_function
 
 from keras import backend as K
 
+from keras.layers import Conv2D
 from keras.layers import Input, Dense, Activation
 from keras.layers import Reshape, Lambda, BatchNormalization
 from keras.layers import Dropout
@@ -100,7 +101,7 @@ class BaseModel(object):
             name='backward_lstm_2')(layer_input)
 
         merged_lstm = concatenate([forward_lstm,
-                                   backward_lstm])  # (None, 32, 1024)
+                                   backward_lstm])  # (None, 32, 512)
         merged_lstm_2 = BatchNormalization()(merged_lstm)
 
         layer_output = merged_lstm
@@ -139,14 +140,15 @@ class BaseModel(object):
         # RNN to output prediction
         inner = Dense(
             number_of_classes, kernel_initializer='he_normal',
-            name='dense2')(decoded_sequence)  #(None, 32, 63)
+            name='dense2')(decoded_sequence)  #(None, 32, 42)
+        #inner = Conv2D(number_of_classes, (1, 1), name='conv2d-dense2', kernel_initializer='he_normal')(inner)  #(None, 32, 42)
 
         predicted_output = Activation('softmax', name='softmax')(inner)
 
         input_labels = Input(
             name='input_labels',
             shape=[self._maximum_text_length],
-            dtype='float32')  # (None ,9)
+            dtype='float32')  # (None, 9)
 
         input_length = Input(
             name='input_length', shape=[1], dtype='int64')  # (None, 1)
