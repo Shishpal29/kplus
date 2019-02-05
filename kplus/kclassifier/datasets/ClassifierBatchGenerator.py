@@ -193,7 +193,7 @@ class ClassifierBatchGenerator(ImageBatchGenerator):
 
         return (self._load_dataset(dataset_dir))
 
-    def _augment_image(self, input_image):
+    def _augment_image(self, input_image, threshold=50.0):
         return (input_image)
 
     def __getitem__(self, batch_index):
@@ -219,8 +219,8 @@ class ClassifierBatchGenerator(ImageBatchGenerator):
                                                      label_tag()]
 
             input_image = cv2.imread(filename, cv2.IMREAD_COLOR)
-            input_image = self._image_to_array(input_image)
             input_image = self._augment(input_image)
+            input_image = self._image_to_array(input_image)
             input_image = self._normalize(input_image)
 
             X[target_index] = input_image

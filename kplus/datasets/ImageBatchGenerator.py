@@ -34,9 +34,6 @@ from kplus.datasets.AbstractBatchGenerator import AbstractBatchGenerator
 
 
 class ImageBatchGenerator(AbstractBatchGenerator):
-
-    __default_threshold = 50.0
-
     def __init__(self):
         AbstractBatchGenerator.__init__(self)
 
@@ -87,14 +84,10 @@ class ImageBatchGenerator(AbstractBatchGenerator):
         input_image = (input_image / 255.0) * 2.0 - 1.0
         return (input_image)
 
-    def _augment_image(self,
-                       input_image,
-                       threshold=ImageBatchGenerator.__default_threshold):
+    def _augment_image(self, input_image, threshold=50.0):
         return (input_image)
 
-    def _augment(self,
-                 input_image,
-                 threshold=ImageBatchGenerator.__default_threshold):
+    def _augment(self, input_image, threshold=50.0):
         augmented_image = input_image
         if (self.use_augmentation() and (random.randint(0, 100) > threshold)):
             augmented_image = self._augment_image(input_image, threshold)

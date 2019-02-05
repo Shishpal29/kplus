@@ -64,13 +64,11 @@ class SequenceBatchGenerator(ImageBatchGenerator):
         number_of_samples = 0
         for image_file in image_filenames:
             image_filename = os.path.join(dataset_dir, image_file)
-            image = cv2.imread(image_filename, cv2.IMREAD_GRAYSCALE)
-            if (image is None):
+            input_image = cv2.imread(image_filename, cv2.IMREAD_GRAYSCALE)
+            if (input_image is None):
                 continue
 
-            image = self._image_to_array(image)
-            self._images.append(image)
-
+            self._images.append(input_image)
             self._texts.append(image_file[0:-4])
 
             self._identifiers.append(number_of_samples)
@@ -99,7 +97,7 @@ class SequenceBatchGenerator(ImageBatchGenerator):
 
         return (self._load_dataset(dataset_dir))
 
-    def _augment_image(self, input_image):
+    def _augment_image(self, input_image, threshold=50.0):
         return (input_image)
 
     def __getitem__(self, batch_index):
@@ -126,6 +124,7 @@ class SequenceBatchGenerator(ImageBatchGenerator):
 
             input_image = self._images[self._identifiers[source_identifier]]
             input_image = self._augment(input_image)
+            input_image = self._image_to_array(input_image)
             input_image = self._normalize(input_image)
 
             text = self._texts[self._identifiers[source_identifier]]
