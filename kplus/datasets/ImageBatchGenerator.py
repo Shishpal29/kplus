@@ -56,10 +56,6 @@ class ImageBatchGenerator(AbstractBatchGenerator):
 
         # OpenCV image has format (width, height, channel) and
         # image with channel=3 is in BGR format.
-
-        opencv_image = cv2.resize(opencv_image,
-                                  (self._image_width, self._image_height))
-
         if (len(opencv_image.shape) == 3):
             opencv_image = cv2.cvtColor(opencv_image, cv2.COLOR_BGR2RGB)
 
@@ -90,5 +86,8 @@ class ImageBatchGenerator(AbstractBatchGenerator):
     def _augment(self, input_image, threshold=50.0):
         augmented_image = input_image
         if (self.use_augmentation() and (random.randint(0, 100) > threshold)):
-            augmented_image = self._augment_image(input_image, threshold)
+            augmented_image = self._augment_image(augmented_image, threshold)
+
+        augmented_image = cv2.resize(augmented_image,
+                                     (self._image_width, self._image_height))
         return (augmented_image)

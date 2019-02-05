@@ -97,9 +97,6 @@ class SequenceBatchGenerator(ImageBatchGenerator):
 
         return (self._load_dataset(dataset_dir))
 
-    def _augment_image(self, input_image, threshold=50.0):
-        return (input_image)
-
     def __getitem__(self, batch_index):
 
         lower_bound = batch_index * self._batch_size
@@ -109,8 +106,13 @@ class SequenceBatchGenerator(ImageBatchGenerator):
             upper_bound = self.number_of_samples()
             lower_bound = upper_bound - self._batch_size
 
-        X_data = np.zeros((self._batch_size, self._image_height,
-                           self._image_width, self._number_of_channels))
+        # (batch size, image height, image width, number of channels)
+        # is converted to
+        # (batch size, image width, image height, number of channels)
+        # for better accuracy.
+        #X_data = np.zeros((self._batch_size, self._image_height, self._image_width, self._number_of_channels))
+        X_data = np.zeros((self._batch_size, self._image_width,
+                           self._image_height, self._number_of_channels))
         Y_data = np.zeros((self._batch_size, self._maximum_text_length))
 
         input_length = np.ones((self._batch_size, 1)) * (
@@ -124,6 +126,13 @@ class SequenceBatchGenerator(ImageBatchGenerator):
 
             input_image = self._images[self._identifiers[source_identifier]]
             input_image = self._augment(input_image)
+
+            # (image height, image width, number of channels)
+            # is converted to
+            # (image width, image height, number of channels)
+            # for better accuracy.
+            input_image = input_image.T
+
             input_image = self._image_to_array(input_image)
             input_image = self._normalize(input_image)
 

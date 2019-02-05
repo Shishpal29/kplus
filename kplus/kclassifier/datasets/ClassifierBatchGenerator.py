@@ -193,9 +193,6 @@ class ClassifierBatchGenerator(ImageBatchGenerator):
 
         return (self._load_dataset(dataset_dir))
 
-    def _augment_image(self, input_image, threshold=50.0):
-        return (input_image)
-
     def __getitem__(self, batch_index):
 
         lower_bound = batch_index * self._batch_size

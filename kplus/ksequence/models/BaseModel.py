@@ -28,6 +28,7 @@ from keras import backend as K
 
 from keras.layers import Input, Dense, Activation
 from keras.layers import Reshape, Lambda, BatchNormalization
+from keras.layers import Dropout
 from keras.layers.merge import add, concatenate
 from keras.layers.recurrent import LSTM
 
@@ -122,6 +123,8 @@ class BaseModel(object):
         inner = Reshape(
             target_shape=((32, 2048)),
             name='reshape')(features)  # (None, 32, 2048)
+
+        inner = Dropout(0.20)(inner)
 
         inner = Dense(
             64,
