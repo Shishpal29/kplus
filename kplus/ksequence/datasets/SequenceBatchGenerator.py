@@ -145,7 +145,7 @@ class SequenceBatchGenerator(ImageBatchGenerator):
             Y_data[target_index][0:length] = characters[0:length]
 
         inputs = {
-            'input_image': X_data,  # (batch_size, 64, 128, 1)
+            'input_image': X_data,  # (batch_size, 128, 64, 1)
             'input_labels': Y_data,  # (batch_size, 8)
             'input_length': input_length,  # (batch_size, 1) -> value = 30
             'label_length': label_length  # (batch_size, 1) -> value = 8
