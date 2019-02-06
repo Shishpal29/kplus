@@ -1,5 +1,32 @@
-import os, random
-import shutil
+# MIT License
+#
+# Copyright (c) 2018
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+import os
+import random
+import fnmatch
 import argparse
 import sys
 
@@ -7,80 +34,100 @@ import sys
 def parse_arguments(argv):
     parser = argparse.ArgumentParser()
 
-    parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-source",
-        "--source_dir",
-        help="source data directory",
+        '--source_root_dir',
         type=str,
-        default="data/")
+        help='Input source directory.',
+        default='/datasets/flowers/')
+
     parser.add_argument(
-        "-target",
-        "--target_dir",
-        help="target data directory",
+        '--target_root_dir',
         type=str,
-        default="../datasets/")
+        help='Output directory.',
+        default='/datasets/flowers/')
+
     parser.add_argument(
-        "-test", "--test_ratio", help="test data ratio", type=int, default=5)
+        "--validation_ratio",
+        help="Validation data ratio",
+        type=float,
+        default=5.0)
+
     parser.add_argument(
-        "-val",
-        "--val_ratio",
-        help="validation data ratio",
-        type=int,
-        default=5)
+        "--test_ratio", help="Test data ratio.", type=float, default=5.0)
 
     return (parser.parse_args(argv))
 
 
-def build(source_dir, target_dir, test_ratio, val_ratio):
-    train_ratio = 100 - test_ratio - val_ratio
-
-    assert (os.path.exists(source_dir)), "Invalid source directory path"
-
-    target_dir = os.path.expanduser(target_dir)
-    source_dir = os.path.expanduser(source_dir)
-
-    if not os.path.exists(target_dir):
-        os.makedirs(target_dir)
-
-    os.makedirs(os.path.join(target_dir, "train/"))
-    os.makedirs(os.path.join(target_dir, "test/"))
-    os.makedirs(os.path.join(target_dir, "val/"))
-
-    train_path = os.path.join(target_dir, "train/")
-    test_path = os.path.join(target_dir, "test/")
-    val_path = os.path.join(target_dir, "val/")
-
-    filenames = os.listdir(source_dir)
-
-    filenames.sort()
-
-    random.seed(230)
-    random.shuffle(filenames)
-
-    split_1 = int((train_ratio / 100) * len(filenames))
-    split_2 = int(((train_ratio + val_ratio) / 100) * len(filenames))
-
-    split = 0
-    for f in filenames:
-        src = os.path.join(source_dir, f)
-        if (split < split_1):
-            dst = os.path.join(train_path, f)
-        elif (split < split_2):
-            dst = os.path.join(val_path, f)
-        else:
-            dst = os.path.join(test_path, f)
-        shutil.move(src, dst)
-        split += 1
-
-
 def main(args):
-    source_dir = args.source_dir
-    target_dir = args.target_dir
-    test_ratio = args.test_ratio
-    val_ratio = args.val_ratio
 
-    build(source_dir, target_dir, test_ratio, val_ratio)
+    if (not args.source_root_dir):
+        raise ValueError(
+            'You must supply source root directory with --source_root_dir.')
+
+    if (not args.target_root_dir):
+        raise ValueError(
+            'You must supply target root directory with --target_root_dir.')
+
+    test_ratio = args.test_ratio
+    if (args.test_ratio < 0.0):
+        test_ratio = 0.0
+
+    validation_ratio = args.validation_ratio
+    if (args.validation_ratio < 0.0):
+        validation_ratio = 0.0
+
+    if ((test_ratio + validation_ratio) > 100.0):
+        test_ratio = validation_ratio = 0.0
+
+    train_ratio = 100.0 - (test_ratio + validation_ratio)
+
+    if (not os.path.exists(args.source_root_dir)):
+        return (False)
+
+    target_root_dir = os.path.expanduser(args.target_root_dir)
+    source_root_dir = os.path.expanduser(args.source_root_dir)
+
+    if (not os.path.exists(target_root_dir)):
+        os.makedirs(target_root_dir)
+
+    train_root_dir = os.path.join(target_root_dir, "train")
+    test_root_dir = os.path.join(target_root_dir, "test")
+    validation_root_dir = os.path.join(target_root_dir, "val")
+
+    os.makedirs(train_root_dir)
+    os.makedirs(test_root_dir)
+    os.makedirs(validation_root_dir)
+
+    patterns = ["*.jpg", "*.jpeg", "*.png", "*.bmp"]
+    image_filenames = []
+    for pattern in patterns:
+        current_pattern_images = fnmatch.filter(
+            os.listdir(source_root_dir), pattern)
+        current_images = len(current_pattern_images)
+        if (current_images > 0):
+            image_filenames = image_filenames + current_pattern_images
+
+    random.shuffle(image_filenames)
+    total_images = len(image_filenames)
+
+    training_images = int((train_ratio / 100.0) * total_images)
+    validation_images = int((validation_ratio / 100.0) * total_images)
+
+    current_image = 0
+    for image_filename in image_filenames:
+        source_filename = os.path.join(source_root_dir, image_filename)
+
+        if (current_image < training_images):
+            target_filename = os.path.join(train_root_dir, image_filename)
+        elif (current_image < (training_images + validation_images)):
+            target_filename = os.path.join(validation_root_dir, image_filename)
+        else:
+            target_filename = os.path.join(test_root_dir, image_filename)
+
+        os.rename(source_filename, target_filename)
+        current_image = current_image + 1
+
+    return (True)
 
 
 if __name__ == '__main__':
