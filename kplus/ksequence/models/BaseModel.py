@@ -124,8 +124,6 @@ class BaseModel(object):
             target_shape=((32, 2048)),
             name='reshape')(features)  # (None, 32, 2048)
 
-        inner = Dropout(0.20)(inner)
-
         inner = Dense(
             64,
             activation='relu',
