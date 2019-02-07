@@ -123,7 +123,7 @@ class SimpleVGGModel(AbstractModel):
             pool_size=(1, 2), name='max4')(inner)  # (None, 32, 4, 512)
 
         inner = Conv2D(
-            512, (2, 2),
+            512, (3, 3),
             padding='same',
             kernel_initializer='he_normal',
             name='con7')(inner)  # (None, 32, 4, 512)
