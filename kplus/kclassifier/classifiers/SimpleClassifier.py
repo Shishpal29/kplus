@@ -32,7 +32,7 @@ from keras import regularizers
 from keras.models import Model
 
 from kplus.kclassifier.classifiers.AbstractClassifier import AbstractClassifier
-
+from kplus.kclassifier.models.ModelFactory import ModelFactory
 
 class SimpleClassifier(AbstractClassifier):
     def __init__(self):
@@ -43,7 +43,6 @@ class SimpleClassifier(AbstractClassifier):
         feature_extractor = parameters['model']['feature_extractor']
         if (not (feature_extractor in ['resnet_50'])):
             return (False)
-        self.use_feature_extractor(feature_extractor)
 
         self._image_width = parameters['model']['image_width']
         self._image_height = parameters['model']['image_height']
@@ -54,11 +53,12 @@ class SimpleClassifier(AbstractClassifier):
         input_layer = Input(
             name='input_layer', shape=input_shape, dtype='float32')
 
-        self._feature_extractor.build(input_shape=input_shape)
-        features = self._feature_extractor.extract_features(input_layer)
+        feature_extractor_model = ModelFactory.simple_model(feature_extractor)
+        feature_extractor_model.build(input_shape=input_shape)
+        features = feature_extractor_model.extract_features(input_layer)
 
         print('Feature extractor model - Start')
-        self._feature_extractor.summary()
+        feature_extractor_model.summary()
         print('Feature extractor model - End')
 
         x = BatchNormalization()(features)
