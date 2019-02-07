@@ -59,12 +59,6 @@ class SimpleClassifier(AbstractClassifier):
 
         x = BatchNormalization()(features)
         x = Flatten()(x)
-        x = Dense(
-            512,
-            activation='relu',
-            kernel_initializer='he_normal',
-            kernel_regularizer=regularizers.l2(0.00004))(x)
-        x = BatchNormalization()(x)
         predictions = Dense(
             self._train_dataset.number_of_classes(),
             activation='softmax',
