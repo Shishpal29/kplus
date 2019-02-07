@@ -71,18 +71,18 @@ def main(args):
     if (not os.path.exists(args.source_root_dir)):
         return (False)
 
-    test_ratio = args.test_ratio
-    if (args.test_ratio < 0.0):
-        test_ratio = 0.0
-
     validation_ratio = args.validation_ratio
     if (args.validation_ratio < 0.0):
         validation_ratio = 0.0
 
-    if ((test_ratio + validation_ratio) > 100.0):
+    test_ratio = args.test_ratio
+    if (args.test_ratio < 0.0):
+        test_ratio = 0.0
+
+    if ((validation_ratio + test_ratio) > 100.0):
         test_ratio = validation_ratio = 0.0
 
-    train_ratio = 100.0 - (test_ratio + validation_ratio)
+    train_ratio = 100.0 - (validation_ratio + test_ratio)
 
     target_root_dir = os.path.expanduser(args.target_root_dir)
     source_root_dir = os.path.expanduser(args.source_root_dir)
