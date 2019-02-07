@@ -131,6 +131,8 @@ class BaseModel(object):
             kernel_regularizer=regularizers.l2(0.00004),
             name='dense1')(inner)  # (None, 32, 64)
 
+        inner = Dropout(0.10)(inner)
+
         encoded_sequence = self._encode_sequence(inner)
         decoded_sequence = self._decode_sequence(encoded_sequence)
 
