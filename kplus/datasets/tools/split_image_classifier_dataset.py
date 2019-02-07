@@ -68,21 +68,21 @@ def main(args):
         raise ValueError(
             'You must supply target root directory with --target_root_dir.')
 
-    test_ratio = args.test_ratio
-    if (args.test_ratio < 0.0):
-        test_ratio = 0.0
+    if (not os.path.exists(args.source_root_dir)):
+        return (False)
 
     validation_ratio = args.validation_ratio
     if (args.validation_ratio < 0.0):
         validation_ratio = 0.0
 
-    if ((test_ratio + validation_ratio) > 100.0):
+    test_ratio = args.test_ratio
+    if (args.test_ratio < 0.0):
+        test_ratio = 0.0
+
+    if ((validation_ratio + test_ratio) > 100.0):
         test_ratio = validation_ratio = 0.0
 
-    train_ratio = 100.0 - (test_ratio + validation_ratio)
-
-    if (not os.path.exists(args.source_root_dir)):
-        return (False)
+    train_ratio = 100.0 - (validation_ratio + test_ratio)
 
     target_root_dir = os.path.expanduser(args.target_root_dir)
     source_root_dir = os.path.expanduser(args.source_root_dir)
@@ -99,33 +99,56 @@ def main(args):
     os.makedirs(validation_root_dir)
 
     patterns = ["*.jpg", "*.jpeg", "*.png", "*.bmp"]
-    image_filenames = []
-    for pattern in patterns:
-        current_pattern_images = fnmatch.filter(
-            os.listdir(source_root_dir), pattern)
-        current_images = len(current_pattern_images)
-        if (current_images > 0):
-            image_filenames = image_filenames + current_pattern_images
 
-    random.shuffle(image_filenames)
-    total_images = len(image_filenames)
+    class_names = [
+        class_name for class_name in os.listdir(source_root_dir)
+        if os.path.isdir(os.path.join(source_root_dir, class_name))
+    ]
 
-    training_images = int((train_ratio / 100.0) * total_images)
-    validation_images = int((validation_ratio / 100.0) * total_images)
+    for class_name in class_names:
+        class_source_dir = os.path.join(source_root_dir, class_name)
 
-    current_image = 0
-    for image_filename in image_filenames:
-        source_filename = os.path.join(source_root_dir, image_filename)
+        class_target_train_dir = os.path.join(target_root_dir, "train",
+                                              class_name)
+        os.makedirs(class_target_train_dir)
 
-        if (current_image < training_images):
-            target_filename = os.path.join(train_root_dir, image_filename)
-        elif (current_image < (training_images + validation_images)):
-            target_filename = os.path.join(validation_root_dir, image_filename)
-        else:
-            target_filename = os.path.join(test_root_dir, image_filename)
+        class_target_val_dir = os.path.join(target_root_dir, "val", class_name)
+        os.makedirs(class_target_val_dir)
 
-        os.rename(source_filename, target_filename)
-        current_image = current_image + 1
+        class_target_test_dir = os.path.join(target_root_dir, "test",
+                                             class_name)
+        os.makedirs(class_target_test_dir)
+
+        image_filenames = []
+        for pattern in patterns:
+            current_pattern_images = fnmatch.filter(
+                os.listdir(class_source_dir), pattern)
+            current_images = len(current_pattern_images)
+            if (current_images > 0):
+                image_filenames = image_filenames + current_pattern_images
+
+        random.shuffle(image_filenames)
+        total_images = len(image_filenames)
+
+        training_images = int((train_ratio / 100.0) * total_images)
+        validation_images = int((validation_ratio / 100.0) * total_images)
+
+        current_image = 0
+        for image_filename in image_filenames:
+            source_filename = os.path.join(class_source_dir, image_filename)
+
+            if (current_image < training_images):
+                target_filename = os.path.join(class_target_train_dir,
+                                               image_filename)
+            elif (current_image < (training_images + validation_images)):
+                target_filename = os.path.join(class_target_val_dir,
+                                               image_filename)
+            else:
+                target_filename = os.path.join(class_target_test_dir,
+                                               image_filename)
+
+            os.rename(source_filename, target_filename)
+            current_image = current_image + 1
 
     return (True)
 

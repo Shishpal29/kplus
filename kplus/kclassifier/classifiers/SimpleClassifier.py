@@ -27,6 +27,8 @@ from __future__ import print_function
 import keras
 from keras.layers import Input
 from keras.layers.core import Dense, Dropout, Flatten
+from keras.layers import BatchNormalization
+from keras import regularizers
 from keras.models import Model
 
 from kplus.kclassifier.classifiers.AbstractClassifier import AbstractClassifier
@@ -55,13 +57,19 @@ class SimpleClassifier(AbstractClassifier):
         self._feature_extractor.build(input_shape=input_shape)
         features = self._feature_extractor.extract_features(input_layer)
 
-        x = Flatten()(features)
-        x = Dense(1024, activation='relu')(x)
-        x = Dropout(0.5)(x)
+        print('Feature extractor model - Start')
+        self._feature_extractor.summary()
+        print('Feature extractor model - End')
+
+        x = BatchNormalization()(features)
+        x = Flatten()(x)
         predictions = Dense(
-            self._train_dataset.number_of_classes(), activation='softmax')(x)
+            self._train_dataset.number_of_classes(),
+            activation='softmax',
+            kernel_initializer='he_normal')(x)
 
         self._keras_model = Model(input=input_layer, output=predictions)
+        self._keras_model.summary()
 
         return (True)
 
