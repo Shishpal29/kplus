@@ -29,11 +29,14 @@ class AbstractModel(object):
     def __init__(self):
         self.feature_extractor = None
 
+    def summary(self):
+        self.feature_extractor.summary()
+
+    def extract_features(self, input_image):
+        return (self.feature_extractor(input_image))
+
     def build(self, input_shape):
         raise NotImplementedError('Must be implemented by the subclass.')
 
     def get_output_shape(self):
         return (self.feature_extractor.get_output_shape_at(-1)[1:3])
-
-    def extract_features(self, input_image):
-        return (self.feature_extractor(input_image))

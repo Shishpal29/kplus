@@ -57,6 +57,10 @@ class SimpleClassifier(AbstractClassifier):
         self._feature_extractor.build(input_shape=input_shape)
         features = self._feature_extractor.extract_features(input_layer)
 
+        print('Feature extractor model - Start')
+        self._feature_extractor.summary()
+        print('Feature extractor model - End')
+
         x = BatchNormalization()(features)
         x = Flatten()(x)
         predictions = Dense(
