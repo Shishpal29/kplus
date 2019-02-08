@@ -119,6 +119,10 @@ class BaseModel(object):
         self._feature_extractor.build(input_shape=input_shape)
         features = self._feature_extractor.extract_features(input_image)
 
+        print('Feature extractor model - Start')
+        self._feature_extractor.summary()
+        print('Feature extractor model - End')
+
         # CNN to RNN
         inner = Reshape(
             target_shape=((32, 2048)),
