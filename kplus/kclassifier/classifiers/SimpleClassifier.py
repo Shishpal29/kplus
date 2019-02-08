@@ -25,14 +25,14 @@ from __future__ import division
 from __future__ import print_function
 
 import keras
+
 from keras.layers import Input
-from keras.layers.core import Dense, Dropout, Flatten
+from keras.layers.core import Dense, Dropout
 from keras.layers import BatchNormalization
-from keras import regularizers
 from keras.models import Model
 
 from kplus.kclassifier.classifiers.AbstractClassifier import AbstractClassifier
-from kplus.kclassifier.models.ModelFactory import ModelFactory
+
 
 class SimpleClassifier(AbstractClassifier):
     def __init__(self):
@@ -44,6 +44,8 @@ class SimpleClassifier(AbstractClassifier):
         if (not (feature_extractor in ['resnet_50'])):
             return (False)
 
+        self.use_feature_extractor(feature_extractor)
+
         self._image_width = parameters['model']['image_width']
         self._image_height = parameters['model']['image_height']
         self._number_of_channels = parameters['model']['number_of_channels']
@@ -53,16 +55,15 @@ class SimpleClassifier(AbstractClassifier):
         input_layer = Input(
             name='input_layer', shape=input_shape, dtype='float32')
 
-        feature_extractor_model = ModelFactory.simple_model(feature_extractor)
-        feature_extractor_model.build(input_shape=input_shape)
-        features = feature_extractor_model.extract_features(input_layer)
+        self._feature_extractor.build(input_shape=input_shape)
+        features = self._feature_extractor.extract_features(input_layer)
 
         print('Feature extractor model - Start')
-        feature_extractor_model.summary()
+        self._feature_extractor.summary()
         print('Feature extractor model - End')
 
-        x = BatchNormalization()(features)
-        x = Flatten()(x)
+        #x = BatchNormalization()(features)
+        x = Dropout(0.1)(features)
         predictions = Dense(
             self._train_dataset.number_of_classes(),
             activation='softmax',

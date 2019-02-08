@@ -43,9 +43,11 @@ class ResNet50Model(AbstractModel):
 
     def build(self, input_shape):
         resnet50 = ResNet50(
-            input_shape=input_shape, weights=None, include_top=False)
+            input_shape=input_shape,
+            weights=None,
+            include_top=False,
+            pooling='avg')
 
-        # Remove the average pooling layer.
-        resnet50.layers.pop()
+        #resnet50.layers.pop()
         self.feature_extractor = Model(resnet50.layers[0].input,
                                        resnet50.layers[-1].output)
