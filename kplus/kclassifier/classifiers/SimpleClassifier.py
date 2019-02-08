@@ -25,10 +25,10 @@ from __future__ import division
 from __future__ import print_function
 
 import keras
+
 from keras.layers import Input
-from keras.layers.core import Dense, Dropout, Flatten
+from keras.layers.core import Dense, Dropout
 from keras.layers import BatchNormalization
-from keras import regularizers
 from keras.models import Model
 
 from kplus.kclassifier.classifiers.AbstractClassifier import AbstractClassifier
@@ -43,6 +43,7 @@ class SimpleClassifier(AbstractClassifier):
         feature_extractor = parameters['model']['feature_extractor']
         if (not (feature_extractor in ['resnet_50'])):
             return (False)
+
         self.use_feature_extractor(feature_extractor)
 
         self._image_width = parameters['model']['image_width']
@@ -61,8 +62,8 @@ class SimpleClassifier(AbstractClassifier):
         self._feature_extractor.summary()
         print('Feature extractor model - End')
 
-        x = BatchNormalization()(features)
-        x = Flatten()(x)
+        #x = BatchNormalization()(features)
+        x = Dropout(0.1)(features)
         predictions = Dense(
             self._train_dataset.number_of_classes(),
             activation='softmax',
