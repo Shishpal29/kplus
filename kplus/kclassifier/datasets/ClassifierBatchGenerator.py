@@ -215,7 +215,7 @@ class ClassifierBatchGenerator(ImageBatchGenerator):
             label = self._dataset[source_identifier][ClassifierBatchGenerator.
                                                      label_tag()]
 
-            input_image = cv2.imread(filename, cv2.IMREAD_COLOR)
+            input_image = self._load_image(filename, color_mode='rgb')
             input_image = self._augment(input_image)
             input_image = self._image_to_array(input_image)
             input_image = self._normalize(input_image)

@@ -24,9 +24,15 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import cv2
 import os
 import numpy as np
+
+try:
+    from PIL import ImageEnhance
+    from PIL import Image as pil_image
+except ImportError:
+    pil_image = None
+    ImageEnhance = None
 
 from kplus.datasets.AbstractBatchGenerator import AbstractBatchGenerator
 from kplus.datasets.ImageBatchGenerator import ImageBatchGenerator
@@ -64,9 +70,8 @@ class SequenceBatchGenerator(ImageBatchGenerator):
         number_of_samples = 0
         for image_file in image_filenames:
             image_filename = os.path.join(dataset_dir, image_file)
-            input_image = cv2.imread(image_filename, cv2.IMREAD_GRAYSCALE)
-            if (input_image is None):
-                continue
+            input_image = self._load_image(
+                image_filename, color_mode='grayscale')
 
             self._images.append(input_image)
             self._texts.append(image_file[0:-4])
@@ -131,7 +136,7 @@ class SequenceBatchGenerator(ImageBatchGenerator):
             # is converted to
             # (image width, image height, number of channels)
             # for better accuracy.
-            input_image = input_image.T
+            input_image = input_image.transpose(pil_image.TRANSPOSE)
 
             input_image = self._image_to_array(input_image)
             input_image = self._normalize(input_image)

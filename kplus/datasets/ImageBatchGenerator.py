@@ -28,7 +28,13 @@ from keras import backend as K
 
 import random
 import numpy as np
-import cv2
+
+try:
+    from PIL import ImageEnhance
+    from PIL import Image as pil_image
+except ImportError:
+    pil_image = None
+    ImageEnhance = None
 
 from kplus.datasets.AbstractBatchGenerator import AbstractBatchGenerator
 
@@ -42,7 +48,33 @@ class ImageBatchGenerator(AbstractBatchGenerator):
         self._image_height = 0
         self._number_of_channels = 0
 
-    def _image_to_array(self, opencv_image, data_format=None):
+    def _load_image(self, image_path, color_mode='rgb'):
+
+        if (pil_image is None):
+            raise ImportError(
+                'Could not import PIL.Image. The use of `_load_image` requires PIL.'
+            )
+
+        image = pil_image.open(image_path)
+        if (color_mode == 'grayscale'):
+            if (image.mode != 'L'):
+                image = image.convert('L')
+        elif (color_mode == 'rgba'):
+            if (image.mode != 'RGBA'):
+                image = image.convert('RGBA')
+        elif (color_mode == 'rgb'):
+            if (image.mode != 'RGB'):
+                image = image.convert('RGB')
+        else:
+            raise ValueError(
+                'color_mode must be "grayscale", "rgb", or "rgba".')
+
+        width_height_tuple = (self._image_width, self._image_height)
+        if (image.size != width_height_tuple):
+            image = image.resize(width_height_tuple, pil_image.BILINEAR)
+        return (image)
+
+    def _image_to_array(self, image, data_format=None, data_type='float32'):
         if (data_format is None):
             data_format = K.image_data_format()
 
@@ -53,13 +85,9 @@ class ImageBatchGenerator(AbstractBatchGenerator):
         # (height, width, channel) - 'channels_last'
         # or
         # (channel, height, width) - 'channels_first'
+        # but original PIL image has format (width, height, channel)
 
-        # OpenCV image has format (width, height, channel) and
-        # image with channel=3 is in BGR format.
-        if (len(opencv_image.shape) == 3):
-            opencv_image = cv2.cvtColor(opencv_image, cv2.COLOR_BGR2RGB)
-
-        numpy_array = np.asarray(opencv_image, dtype=K.floatx())
+        numpy_array = np.asarray(image, dtype=data_type)
 
         if (len(numpy_array.shape) == 3):
             if (data_format == 'channels_first'):
@@ -80,14 +108,11 @@ class ImageBatchGenerator(AbstractBatchGenerator):
         input_image = (input_image / 255.0) * 2.0 - 1.0
         return (input_image)
 
-    def _augment_image(self, input_image, threshold=50.0):
+    def _augment_image(self, input_image):
         return (input_image)
 
-    def _augment(self, input_image, threshold=50.0):
+    def _augment(self, input_image):
         augmented_image = input_image
-        if (self.use_augmentation() and (random.randint(0, 100) > threshold)):
-            augmented_image = self._augment_image(augmented_image, threshold)
-
-        augmented_image = cv2.resize(augmented_image,
-                                     (self._image_width, self._image_height))
+        if (self.use_augmentation()):
+            augmented_image = self._augment_image(augmented_image)
         return (augmented_image)
