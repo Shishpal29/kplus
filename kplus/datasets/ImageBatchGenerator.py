@@ -104,6 +104,53 @@ class ImageBatchGenerator(AbstractBatchGenerator):
 
         return (numpy_array)
 
+    def _array_to_image(numpy_array,
+                        data_format='channels_last',
+                        scale=True,
+                        dtype='float32'):
+        if pil_image is None:
+            raise ImportError(
+                'Could not import PIL.Image. The use of `_array_to_image` requires PIL.'
+            )
+
+        numpy_array = np.asarray(numpy_array, dtype=dtype)
+        if (numpy_array.ndim != 3):
+            raise ValueError(
+                'Expected image array to have rank 3 (single image). Got array with shape: %s'
+                % (numpy_array.shape))
+
+        if (data_format not in {'channels_first', 'channels_last'}):
+            raise ValueError('Invalid data_format - %s' % data_format)
+
+        # Numpy array x has format
+        # (height, width, channel) - 'channels_last'
+        # or
+        # (channel, height, width) - 'channels_first'
+        # but original PIL image has format (width, height, channel)
+        if data_format == 'channels_first':
+            numpy_array = numpy_array.transpose(1, 2, 0)
+
+        if scale:
+            numpy_array = numpy_array + max(-np.min(numpy_array), 0)
+            x_max = np.max(numpy_array)
+            if x_max != 0:
+                numpy_array /= x_max
+            numpy_array *= 255
+
+        if (numpy_array.shape[2] == 4):
+            # RGBA
+            return pil_image.fromarray(numpy_array.astype('uint8'), 'RGBA')
+        elif (numpy_array.shape[2] == 3):
+            # RGB
+            return pil_image.fromarray(numpy_array.astype('uint8'), 'RGB')
+        elif (numpy_array.shape[2] == 1):
+            # grayscale
+            return pil_image.fromarray(numpy_array[:, :, 0].astype('uint8'),
+                                       'L')
+        else:
+            raise ValueError(
+                'Unsupported channel number - %s' % (numpy_array.shape[2]))
+
     def _normalize(self, input_image):
         input_image = (input_image / 255.0) * 2.0 - 1.0
         return (input_image)
