@@ -4,12 +4,12 @@
 		"image_height" : 224,
 		"number_of_channels" : 3,
 		"feature_extractor" : "resnet_50",
-		"base_learning_rate" : 0.001,
 		"model_filename" : "/models/keras/flowers/model.hdf5"
     },
 
     "train" : {	    
 		"train_root_dir" : "/models/keras/flowers/",
+		"base_learning_rate" : 0.001,
 		"max_number_of_epoch" : 30,
 		"dataset_dir" : "/datasets/flowers/train/",
 		"batch_size" : 16,
