@@ -32,10 +32,10 @@ import keras
 import cv2
 
 from kplus.datasets.AbstractBatchGenerator import AbstractBatchGenerator
-from kplus.datasets.ImageBatchGenerator import ImageBatchGenerator
+from kplus.datasets.AugmentedBatchGenerator import AugmentedBatchGenerator
 
 
-class ClassifierBatchGenerator(ImageBatchGenerator):
+class ClassifierBatchGenerator(AugmentedBatchGenerator):
 
     _minimum_images = 1
 
@@ -48,7 +48,7 @@ class ClassifierBatchGenerator(ImageBatchGenerator):
         return ('label')
 
     def __init__(self):
-        ImageBatchGenerator.__init__(self)
+        AugmentedBatchGenerator.__init__(self)
 
         self._labels_filename = 'labels.txt'
 

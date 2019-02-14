@@ -60,9 +60,6 @@ class ImageBatchGenerator(AbstractBatchGenerator):
             raise ValueError(
                 'color_mode must be "grayscale", "rgb", or "rgba".')
 
-        width_height_tuple = (self._image_width, self._image_height)
-        if (image.size != width_height_tuple):
-            image = image.resize(width_height_tuple, pil_image.BILINEAR)
         return (image)
 
     def _image_to_array(self, image, data_format=None, data_type='float32'):
@@ -147,8 +144,15 @@ class ImageBatchGenerator(AbstractBatchGenerator):
         input_image = input_image.transpose(pil_image.TRANSPOSE)
         return (input_image)
 
+    def _resize(self, input_image):
+        width_height_tuple = (self._image_width, self._image_height)
+        output_image = input_image.resize(width_height_tuple,
+                                          pil_image.BILINEAR)
+        return (output_image)
+
     def _augment_image(self, input_image):
-        return (input_image)
+        output_image = self._resize(input_image)
+        return (output_image)
 
     def _augment(self, input_image):
         augmented_image = input_image
