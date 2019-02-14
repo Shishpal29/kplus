@@ -29,12 +29,8 @@ from keras import backend as K
 import random
 import numpy as np
 
-try:
-    from PIL import ImageEnhance
-    from PIL import Image as pil_image
-except ImportError:
-    pil_image = None
-    ImageEnhance = None
+from PIL import ImageEnhance
+from PIL import Image as pil_image
 
 from kplus.datasets.AbstractBatchGenerator import AbstractBatchGenerator
 
@@ -49,11 +45,6 @@ class ImageBatchGenerator(AbstractBatchGenerator):
         self._number_of_channels = 0
 
     def _load_image(self, image_path, color_mode='rgb'):
-
-        if (pil_image is None):
-            raise ImportError(
-                'Could not import PIL.Image. The use of `_load_image` requires PIL.'
-            )
 
         image = pil_image.open(image_path)
         if (color_mode == 'grayscale'):
@@ -81,11 +72,11 @@ class ImageBatchGenerator(AbstractBatchGenerator):
         if (data_format not in ['channels_first', 'channels_last']):
             raise ValueError('Unknown data_format - ', data_format)
 
-        # Numpy array x has format
+        # Original numpy array has format
         # (height, width, channel) - 'channels_last'
         # or
         # (channel, height, width) - 'channels_first'
-        # but original PIL image has format (width, height, channel)
+        # Original PIL image has format - (width, height, channel)
 
         numpy_array = np.asarray(image, dtype=data_type)
 
@@ -108,10 +99,6 @@ class ImageBatchGenerator(AbstractBatchGenerator):
                         data_format='channels_last',
                         scale=True,
                         dtype='float32'):
-        if pil_image is None:
-            raise ImportError(
-                'Could not import PIL.Image. The use of `_array_to_image` requires PIL.'
-            )
 
         numpy_array = np.asarray(numpy_array, dtype=dtype)
         if (numpy_array.ndim != 3):
@@ -122,11 +109,12 @@ class ImageBatchGenerator(AbstractBatchGenerator):
         if (data_format not in {'channels_first', 'channels_last'}):
             raise ValueError('Invalid data_format - %s' % data_format)
 
-        # Numpy array x has format
+        # Original numpy array has format
         # (height, width, channel) - 'channels_last'
         # or
         # (channel, height, width) - 'channels_first'
-        # but original PIL image has format (width, height, channel)
+        # Original PIL image has format - (width, height, channel)
+
         if data_format == 'channels_first':
             numpy_array = numpy_array.transpose(1, 2, 0)
 
@@ -153,6 +141,10 @@ class ImageBatchGenerator(AbstractBatchGenerator):
 
     def _normalize(self, input_image):
         input_image = (input_image / 255.0) * 2.0 - 1.0
+        return (input_image)
+
+    def _transpose(self, input_image):
+        input_image = input_image.transpose(pil_image.TRANSPOSE)
         return (input_image)
 
     def _augment_image(self, input_image):

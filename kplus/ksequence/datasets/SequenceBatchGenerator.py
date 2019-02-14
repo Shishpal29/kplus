@@ -27,13 +27,6 @@ from __future__ import print_function
 import os
 import numpy as np
 
-try:
-    from PIL import ImageEnhance
-    from PIL import Image as pil_image
-except ImportError:
-    pil_image = None
-    ImageEnhance = None
-
 from kplus.datasets.AbstractBatchGenerator import AbstractBatchGenerator
 from kplus.datasets.ImageBatchGenerator import ImageBatchGenerator
 
@@ -136,7 +129,7 @@ class SequenceBatchGenerator(ImageBatchGenerator):
             # is converted to
             # (image width, image height, number of channels)
             # for better accuracy.
-            input_image = input_image.transpose(pil_image.TRANSPOSE)
+            input_image = self._transpose(input_image)
 
             input_image = self._image_to_array(input_image)
             input_image = self._normalize(input_image)
