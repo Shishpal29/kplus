@@ -62,12 +62,12 @@ class SimpleClassifier(AbstractClassifier):
         self._feature_extractor.summary()
         print('Feature extractor model - End')
 
-        #x = BatchNormalization()(features)
-        x = Dropout(0.1)(features)
+        inner = BatchNormalization()(features)
+        inner = Dropout(0.1)(inner)
         predictions = Dense(
             self._train_dataset.number_of_classes(),
             activation='softmax',
-            kernel_initializer='he_normal')(x)
+            kernel_initializer='he_normal')(inner)
 
         self._keras_model = Model(input=input_layer, output=predictions)
         self._keras_model.summary()

@@ -25,17 +25,18 @@ from __future__ import division
 from __future__ import print_function
 
 import os
-import random
 import fnmatch
+
 import numpy as np
-import keras
 import cv2
 
+import keras
+
 from kplus.datasets.AbstractBatchGenerator import AbstractBatchGenerator
-from kplus.datasets.ImageBatchGenerator import ImageBatchGenerator
+from kplus.datasets.AugmentedBatchGenerator import AugmentedBatchGenerator
 
 
-class ClassifierBatchGenerator(ImageBatchGenerator):
+class ClassifierBatchGenerator(AugmentedBatchGenerator):
 
     _minimum_images = 1
 
@@ -48,7 +49,7 @@ class ClassifierBatchGenerator(ImageBatchGenerator):
         return ('label')
 
     def __init__(self):
-        ImageBatchGenerator.__init__(self)
+        AugmentedBatchGenerator.__init__(self)
 
         self._labels_filename = 'labels.txt'
 
@@ -71,7 +72,7 @@ class ClassifierBatchGenerator(ImageBatchGenerator):
             if (os.path.isdir(class_path)):
                 class_names.append(class_name)
 
-        random.shuffle(class_names)
+        np.random.shuffle(class_names)
 
         labels_to_class_names = dict(zip(range(len(class_names)), class_names))
         labels_file_path = os.path.join(target_root_dir,

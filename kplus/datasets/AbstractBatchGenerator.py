@@ -25,7 +25,7 @@ from __future__ import division
 from __future__ import print_function
 
 import os
-import random
+import numpy as np
 import math
 
 import keras
@@ -55,7 +55,7 @@ class AbstractBatchGenerator(keras.utils.Sequence):
         self._shuffle = True
 
         self._random_seed = 7
-        random.seed(self._random_seed)
+        np.random.seed(self._random_seed)
 
     def use_augmentation(self):
         return (self._use_augmentation)
@@ -71,7 +71,7 @@ class AbstractBatchGenerator(keras.utils.Sequence):
 
     def on_epoch_end(self):
         if (self._shuffle == True):
-            random.shuffle(self._identifiers)
+            np.random.shuffle(self._identifiers)
 
     def _load_dataset(self, dataset_dir):
         raise NotImplementedError('Must be implemented by the subclass.')

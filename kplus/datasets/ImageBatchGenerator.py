@@ -26,7 +26,6 @@ from __future__ import print_function
 
 from keras import backend as K
 
-import random
 import numpy as np
 import cv2
 
@@ -49,12 +48,12 @@ class ImageBatchGenerator(AbstractBatchGenerator):
         if (data_format not in ['channels_first', 'channels_last']):
             raise ValueError('Unknown data_format - ', data_format)
 
-        # Numpy array x has format
+        # Original numpy array has format
         # (height, width, channel) - 'channels_last'
         # or
         # (channel, height, width) - 'channels_first'
 
-        # OpenCV image has format (width, height, channel) and
+        # Original OpenCV image has format (width, height, channel) and
         # image with channel=3 is in BGR format.
         if (len(opencv_image.shape) == 3):
             opencv_image = cv2.cvtColor(opencv_image, cv2.COLOR_BGR2RGB)
@@ -80,14 +79,19 @@ class ImageBatchGenerator(AbstractBatchGenerator):
         input_image = (input_image / 255.0) * 2.0 - 1.0
         return (input_image)
 
-    def _augment_image(self, input_image, threshold=50.0):
-        return (input_image)
+    def _resize(self, input_image):
+        output_image = cv2.resize(input_image,
+                                  (self._image_width, self._image_height))
+        return (output_image)
 
-    def _augment(self, input_image, threshold=50.0):
-        augmented_image = input_image
-        if (self.use_augmentation() and (random.randint(0, 100) > threshold)):
-            augmented_image = self._augment_image(augmented_image, threshold)
+    def _augment_image(self, input_image):
+        output_image = self._resize(input_image)
+        return (output_image)
 
-        augmented_image = cv2.resize(augmented_image,
-                                     (self._image_width, self._image_height))
+    def _augment(self, input_image):
+        if (self.use_augmentation()):
+            augmented_image = self._augment_image(input_image)
+        else:
+            augmented_image = self._resize(input_image)
+
         return (augmented_image)

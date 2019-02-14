@@ -24,9 +24,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import cv2
 import os
+
 import numpy as np
+import cv2
 
 from kplus.datasets.AbstractBatchGenerator import AbstractBatchGenerator
 from kplus.datasets.ImageBatchGenerator import ImageBatchGenerator
