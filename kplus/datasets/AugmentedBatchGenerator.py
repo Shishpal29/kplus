@@ -26,11 +26,8 @@ from __future__ import print_function
 
 from keras import backend as K
 
-import random
 import numpy as np
-
-from PIL import ImageEnhance
-from PIL import Image as pil_image
+import cv2
 
 from kplus.datasets.ImageBatchGenerator import ImageBatchGenerator
 
@@ -39,29 +36,75 @@ class AugmentedBatchGenerator(ImageBatchGenerator):
     def __init__(self):
         ImageBatchGenerator.__init__(self)
 
-    def _random_brightness(self, input_image, maximum_delta=(32.0 / 255.0)):
+    def _can_augment(self):
+        return (np.random.uniform(0.0, 1.0) < 0.5)
 
-        input_image = ImageEnhance.Brightness(input_image)
-        value = random.uniform(-1.0 * maximum_delta, +1.0 * maximum_delta)
-        input_image = input_image.enhance(value)
-        return (input_image)
+    def _random_brightness(self, input_image, maximum_delta=32.0):
+        if ((not self._can_augment()) or (maximum_delta < 0)):
+            return (input_image)
 
-    def _random_saturation(self, input_image, lower_limit=0.5,
-                           upper_limit=1.5):
-        return (input_image)
+        data_type = input_image.dtype
+        input_image = input_image.astype('float32')
+
+        value = np.random.uniform(-1.0 * maximum_delta, +1.0 * maximum_delta)
+        input_image = input_image + value
+
+        if (data_type == np.uint8):
+            input_image = np.clip(input_image, 0, 255)
+
+        return (input_image.astype(data_type))
+
+    def _random_saturation(self, input_image, alpha=0.4):
+
+        if ((not self._can_augment()) or (alpha >= 1.0)):
+            return (input_image)
+
+        value = 1.0 + np.random.uniform(-1.0 * alpha, +1.0 * alpha)
+
+        data_type = input_image.dtype
+        gray_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2GRAY)
+
+        output_image = input_image * value + (gray_image *
+                                              (1.0 - value))[:, :, np.newaxis]
+
+        return (output_image.astype(data_type))
 
     def _random_hue(self, input_image, maximum_delta=0.2):
-        return (input_image)
+
+        if (not self._can_augment()):
+            return (input_image)
+
+        hue_value = np.random.uniform(-1.0 * maximum_delta,
+                                      +1.0 * maximum_delta)
+
+        hsv_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2HSV)
+
+        # OpenCV uses 0-179 degree instead of 0-359 degree
+        hsv_image[..., 0] = (hsv_image[..., 0] + hue_value) % 180
+
+        output_image = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
+
+        return (output_image)
 
     def _random_contrast(self, input_image, lower_limit=0.5, upper_limit=1.5):
 
-        input_image = ImageEnhance.Contrast(input_image)
-        value = random.uniform(lower_limit, upper_limit)
-        input_image = input_image.enhance(value)
-        return (input_image)
+        if ((not self._can_augment()) or (lower_limit > upper_limit)):
+            return (input_image)
+
+        value = np.random.uniform(lower_limit, upper_limit)
+        data_type = input_image.dtype
+        input_image = input_image.astype('float32')
+
+        mean = np.mean(input_image, axis=(0, 1), keepdims=True)
+        input_image = (input_image - mean) * value + mean
+
+        if (data_type == np.uint8):
+            input_image = np.clip(input_image, 0, 255)
+
+        return (input_image.astype(data_type))
 
     def _distort_color(self, input_image):
-        choice = random.choice([0, 1, 2, 3])
+        choice = np.random.choice([0, 1, 2, 3])
         if (choice == 0):
             input_image = self._random_brightness(input_image)
             input_image = self._random_saturation(input_image)
@@ -86,23 +129,24 @@ class AugmentedBatchGenerator(ImageBatchGenerator):
         return (input_image)
 
     def _random_flip_left_right(self, input_image):
-        input_image = input_image.transpose(pil_image.FLIP_LEFT_RIGHT)
+        if (self._can_augment()):
+            input_image = cv2.flip(input_image, 1)
         return (input_image)
 
     def _random_resize(self, input_image):
-        image_width, image_height = input_image.size
+        image_height, image_width = input_image.shape[:2]
         image_area = image_width * image_height
         maximum_attempts = 10
         output_image = input_image
         for attempt in range(maximum_attempts):
 
-            target_area = random.uniform(0.5, 1.0) * image_area
-            aspect_ratio = random.uniform(3.0 / 4.0, 4.0 / 3.0)
+            target_area = np.random.uniform(0.5, 1.0) * image_area
+            aspect_ratio = np.random.uniform(3.0 / 4.0, 4.0 / 3.0)
 
             new_width = int(np.sqrt(target_area * aspect_ratio))
             new_height = int(np.sqrt(target_area / aspect_ratio))
 
-            if (random.uniform(0.0, 1.0) < 0.5):
+            if (self._can_augment()):
                 new_width, new_height = new_height, new_width
 
             x1 = y1 = 0
@@ -110,15 +154,15 @@ class AugmentedBatchGenerator(ImageBatchGenerator):
                 if (image_width == new_width):
                     x1 = 0
                 else:
-                    random.randint(0, image_width - new_width)
+                    np.random.randint(0, image_width - new_width)
 
                 if (image_height == new_height):
                     y1 = 0
                 else:
-                    random.randint(0, image_height - new_height)
+                    np.random.randint(0, image_height - new_height)
 
-                output_image = input_image.crop((x1, y1, (x1 + new_width),
-                                                 (y1 + new_height)))
+                output_image = input_image[y1:(y1 + new_height), x1:(
+                    x1 + new_width)]
                 break
 
         output_image = self._resize(output_image)
