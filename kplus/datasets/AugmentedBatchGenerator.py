@@ -39,6 +39,56 @@ class AugmentedBatchGenerator(ImageBatchGenerator):
     def __init__(self):
         ImageBatchGenerator.__init__(self)
 
+    def _random_brightness(self, input_image, maximum_delta=(32.0 / 255.0)):
+
+        input_image = ImageEnhance.Brightness(input_image)
+        value = random.uniform(-1.0 * maximum_delta, +1.0 * maximum_delta)
+        input_image = input_image.enhance(value)
+        return (input_image)
+
+    def _random_saturation(self, input_image, lower_limit=0.5,
+                           upper_limit=1.5):
+        return (input_image)
+
+    def _random_hue(self, input_image, maximum_delta=0.2):
+        return (input_image)
+
+    def _random_contrast(self, input_image, lower_limit=0.5, upper_limit=1.5):
+
+        input_image = ImageEnhance.Contrast(input_image)
+        value = random.uniform(lower_limit, upper_limit)
+        input_image = input_image.enhance(value)
+        return (input_image)
+
+    def _distort_color(self, input_image):
+        choice = random.choice([0, 1, 2, 3])
+        if (choice == 0):
+            input_image = self._random_brightness(input_image)
+            input_image = self._random_saturation(input_image)
+            input_image = self._random_hue(input_image)
+            input_image = self._random_contrast(input_image)
+        elif (choice == 1):
+            input_image = self._random_saturation(input_image)
+            input_image = self._random_brightness(input_image)
+            input_image = self._random_contrast(input_image)
+            input_image = self._random_hue(input_image)
+        elif (choice == 2):
+            input_image = self._random_contrast(input_image)
+            input_image = self._random_hue(input_image)
+            input_image = self._random_brightness(input_image)
+            input_image = self._random_saturation(input_image)
+        else:
+            input_image = self._random_hue(input_image)
+            input_image = self._random_saturation(input_image)
+            input_image = self._random_contrast(input_image)
+            input_image = self._random_brightness(input_image)
+
+        return (input_image)
+
+    def _random_flip_left_right(self, input_image):
+        input_image = input_image.transpose(pil_image.FLIP_LEFT_RIGHT)
+        return (input_image)
+
     def _random_resize(self, input_image):
         image_width, image_height = input_image.size
         image_area = image_width * image_height
@@ -74,19 +124,8 @@ class AugmentedBatchGenerator(ImageBatchGenerator):
         output_image = self._resize(output_image)
         return (output_image)
 
-    def _random_brightness(self, input_image, brightness_range):
-        if (len(brightness_range) != 2):
-            raise ValueError(
-                'brightness_range should be tuple or list of two floats. Received argument - ',
-                brightness_range)
-
-        input_image = self._array_to_image(input_image)
-        input_image = ImageEnhance.Brightness(input_image)
-        value = np.random.uniform(brightness_range[0], brightness_range[1])
-        input_image = input_image.enhance(value)
-        input_image = self._image_to_array(input_image)
-        return (input_image)
-
     def _augment_image(self, input_image):
         output_image = self._random_resize(input_image)
+        output_image = self._random_flip_left_right(output_image)
+        output_image = self._distort_color(output_image)
         return (output_image)
