@@ -44,7 +44,7 @@ class SimpleOCR(AbstractApplication):
         self._model_letters = None
 
     def _setup_loss_function(self, parameters):
-        base_learning_rate = parameters['model']['base_learning_rate']
+        base_learning_rate = parameters['train']['base_learning_rate']
         optimizer = Adam(lr=base_learning_rate)
 
         # Dummy lambda function for the loss

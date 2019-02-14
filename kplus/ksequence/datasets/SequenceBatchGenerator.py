@@ -41,6 +41,7 @@ class SequenceBatchGenerator(ImageBatchGenerator):
 
         self._maximum_text_length = 0
         self._downsample_factor = 1.0
+        self._skip_characters = 4
 
         self._identifiers = []
         self._images = []
@@ -70,7 +71,7 @@ class SequenceBatchGenerator(ImageBatchGenerator):
                 continue
 
             self._images.append(input_image)
-            self._texts.append(image_file[0:-4])
+            self._texts.append(image_file[0:-1 * self._skip_characters])
 
             self._identifiers.append(number_of_samples)
 
@@ -90,6 +91,8 @@ class SequenceBatchGenerator(ImageBatchGenerator):
         self._image_width = parameters['model']['image_width']
         self._image_height = parameters['model']['image_height']
         self._number_of_channels = parameters['model']['number_of_channels']
+
+        self._skip_characters = parameters['model']['skip_characters']
 
         self._batch_size = parameters[split_name]['batch_size']
 

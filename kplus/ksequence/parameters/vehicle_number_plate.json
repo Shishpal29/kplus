@@ -8,12 +8,13 @@
 		"image_height" : 64,
 		"number_of_channels" : 1,
 		"downsample_factor" : 4,
-		"base_learning_rate" : 0.001,
+		"skip_characters" : 4,
 		"model_filename" : "/models/keras/vehicle_number_plate/model.hdf5"
     },
 
     "train" : {	    
 		"train_root_dir" : "/models/keras/vehicle_number_plate/",
+		"base_learning_rate" : 0.001,
 		"max_number_of_epoch" : 30,
 		"dataset_dir" : "/datasets/vehicle_number_plate/train/",
 		"batch_size" : 128,
