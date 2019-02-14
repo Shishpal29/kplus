@@ -26,11 +26,8 @@ from __future__ import print_function
 
 from keras import backend as K
 
-import random
 import numpy as np
-
-from PIL import ImageEnhance
-from PIL import Image as pil_image
+import cv2
 
 from kplus.datasets.AbstractBatchGenerator import AbstractBatchGenerator
 
@@ -44,25 +41,7 @@ class ImageBatchGenerator(AbstractBatchGenerator):
         self._image_height = 0
         self._number_of_channels = 0
 
-    def _load_image(self, image_path, color_mode='rgb'):
-
-        image = pil_image.open(image_path)
-        if (color_mode == 'grayscale'):
-            if (image.mode != 'L'):
-                image = image.convert('L')
-        elif (color_mode == 'rgba'):
-            if (image.mode != 'RGBA'):
-                image = image.convert('RGBA')
-        elif (color_mode == 'rgb'):
-            if (image.mode != 'RGB'):
-                image = image.convert('RGB')
-        else:
-            raise ValueError(
-                'color_mode must be "grayscale", "rgb", or "rgba".')
-
-        return (image)
-
-    def _image_to_array(self, image, data_format=None, data_type='float32'):
+    def _image_to_array(self, opencv_image, data_format=None):
         if (data_format is None):
             data_format = K.image_data_format()
 
@@ -73,9 +52,13 @@ class ImageBatchGenerator(AbstractBatchGenerator):
         # (height, width, channel) - 'channels_last'
         # or
         # (channel, height, width) - 'channels_first'
-        # Original PIL image has format - (width, height, channel)
 
-        numpy_array = np.asarray(image, dtype=data_type)
+        # Original OpenCV image has format (width, height, channel) and
+        # image with channel=3 is in BGR format.
+        if (len(opencv_image.shape) == 3):
+            opencv_image = cv2.cvtColor(opencv_image, cv2.COLOR_BGR2RGB)
+
+        numpy_array = np.asarray(opencv_image, dtype=K.floatx())
 
         if (len(numpy_array.shape) == 3):
             if (data_format == 'channels_first'):
@@ -92,62 +75,13 @@ class ImageBatchGenerator(AbstractBatchGenerator):
 
         return (numpy_array)
 
-    def _array_to_image(numpy_array,
-                        data_format='channels_last',
-                        scale=True,
-                        dtype='float32'):
-
-        numpy_array = np.asarray(numpy_array, dtype=dtype)
-        if (numpy_array.ndim != 3):
-            raise ValueError(
-                'Expected image array to have rank 3 (single image). Got array with shape: %s'
-                % (numpy_array.shape))
-
-        if (data_format not in {'channels_first', 'channels_last'}):
-            raise ValueError('Invalid data_format - %s' % data_format)
-
-        # Original numpy array has format
-        # (height, width, channel) - 'channels_last'
-        # or
-        # (channel, height, width) - 'channels_first'
-        # Original PIL image has format - (width, height, channel)
-
-        if data_format == 'channels_first':
-            numpy_array = numpy_array.transpose(1, 2, 0)
-
-        if scale:
-            numpy_array = numpy_array + max(-np.min(numpy_array), 0)
-            x_max = np.max(numpy_array)
-            if x_max != 0:
-                numpy_array /= x_max
-            numpy_array *= 255
-
-        if (numpy_array.shape[2] == 4):
-            # RGBA
-            return pil_image.fromarray(numpy_array.astype('uint8'), 'RGBA')
-        elif (numpy_array.shape[2] == 3):
-            # RGB
-            return pil_image.fromarray(numpy_array.astype('uint8'), 'RGB')
-        elif (numpy_array.shape[2] == 1):
-            # grayscale
-            return pil_image.fromarray(numpy_array[:, :, 0].astype('uint8'),
-                                       'L')
-        else:
-            raise ValueError(
-                'Unsupported channel number - %s' % (numpy_array.shape[2]))
-
     def _normalize(self, input_image):
         input_image = (input_image / 255.0) * 2.0 - 1.0
         return (input_image)
 
-    def _transpose(self, input_image):
-        input_image = input_image.transpose(pil_image.TRANSPOSE)
-        return (input_image)
-
     def _resize(self, input_image):
-        width_height_tuple = (self._image_width, self._image_height)
-        output_image = input_image.resize(width_height_tuple,
-                                          pil_image.BILINEAR)
+        output_image = cv2.resize(input_image,
+                                  (self._image_width, self._image_height))
         return (output_image)
 
     def _augment_image(self, input_image):
@@ -155,7 +89,9 @@ class ImageBatchGenerator(AbstractBatchGenerator):
         return (output_image)
 
     def _augment(self, input_image):
-        augmented_image = input_image
         if (self.use_augmentation()):
-            augmented_image = self._augment_image(augmented_image)
+            augmented_image = self._augment_image(input_image)
+        else:
+            augmented_image = self._resize(input_image)
+
         return (augmented_image)

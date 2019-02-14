@@ -25,11 +25,12 @@ from __future__ import division
 from __future__ import print_function
 
 import os
-import random
 import fnmatch
+
 import numpy as np
-import keras
 import cv2
+
+import keras
 
 from kplus.datasets.AbstractBatchGenerator import AbstractBatchGenerator
 from kplus.datasets.AugmentedBatchGenerator import AugmentedBatchGenerator
@@ -71,7 +72,7 @@ class ClassifierBatchGenerator(AugmentedBatchGenerator):
             if (os.path.isdir(class_path)):
                 class_names.append(class_name)
 
-        random.shuffle(class_names)
+        np.random.shuffle(class_names)
 
         labels_to_class_names = dict(zip(range(len(class_names)), class_names))
         labels_file_path = os.path.join(target_root_dir,
@@ -215,7 +216,7 @@ class ClassifierBatchGenerator(AugmentedBatchGenerator):
             label = self._dataset[source_identifier][ClassifierBatchGenerator.
                                                      label_tag()]
 
-            input_image = self._load_image(filename, color_mode='rgb')
+            input_image = cv2.imread(filename, cv2.IMREAD_COLOR)
             input_image = self._augment(input_image)
             input_image = self._image_to_array(input_image)
             input_image = self._normalize(input_image)
